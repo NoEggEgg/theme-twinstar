@@ -1,0 +1,498 @@
+<!doctype html>
+
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  xmlns:halo="https://halo.run/schema/thymeleaf"
+  th:lang="${#locale.toLanguageTag}"
+  th:fragment="html"
+  th:classappend="|t-scheme-${cfg.appearance.color_scheme} color-scheme-${cfg.appearance.color_scheme}|"
+  th:attr="data-template=${_templateId}, data-color-scheme=${cfg.appearance.color_scheme}, data-title-face=${cfg.appearance.title_face}, data-grain=${cfg.appearance.grain_level}, data-motion=${cfg.motion.level}, data-scene=${cfg.motion.scene}, data-scene-density=${cfg.motion.density}, data-auto-hide=${cfg.motion.auto_hide_topbar}, data-cursor=${cfg.motion.cursor}, data-font-scale=${cfg.appearance.font_scale}, data-wqs-anniversary=${cfg.days.anniversary_date}, data-wqs-tz=${cfg.days.timezone}, data-wqs-name-a=${cfg.couple.partner_a_name}, data-wqs-name-b=${cfg.couple.partner_b_name}, data-wqs-celebrations=${#strings.listJoin(cfg.days.celebrations, ',')}, data-wqs-milestones=${#strings.listJoin(cfg.days.milestones, ',')}, data-list-density=${cfg.home.list_density}, data-wqs-lb-prev=${#messages.msg('lightbox.prev')}, data-wqs-lb-next=${#messages.msg('lightbox.next')}, data-wqs-lb-close=${#messages.msg('lightbox.close')}"
+  th:styleappend="|--t-primary: ${cfg.appearance.primary_color}; --wqs-tone-a: ${cfg.couple.partner_a_tone}; --wqs-tone-b: ${cfg.couple.partner_b_tone}|"
+  th:with="
+    pageTitleSafe = ${#ctx.containsVariable('pageTitle') ? (#ctx.getVariable('pageTitle') != null ? #ctx.getVariable('pageTitle') : '') : ''},
+    cfg = ${ { 'appearance': { 'color_scheme': ((theme.config.appearance?.color_scheme == null) or #strings.isEmpty(#strings.toString(theme.config.appearance.color_scheme)) ? 'auto' : theme.config.appearance.color_scheme), 'primary_color': ((theme.config.appearance?.primary_color == null) or #strings.isEmpty(#strings.toString(theme.config.appearance.primary_color)) ? '#b23f62' : theme.config.appearance.primary_color), 'title_face': ((theme.config.appearance?.title_face == null) or #strings.isEmpty(#strings.toString(theme.config.appearance.title_face)) ? 'kai' : theme.config.appearance.title_face), 'grain_level': ((theme.config.appearance?.grain_level == null) or #strings.isEmpty(#strings.toString(theme.config.appearance.grain_level)) ? '4' : theme.config.appearance.grain_level), 'font_scale': ((theme.config.appearance?.font_scale == null) or #strings.isEmpty(#strings.toString(theme.config.appearance.font_scale)) ? 'normal' : theme.config.appearance.font_scale) }, 'couple': { 'partner_a_name': ((theme.config.couple?.partner_a_name == null) or #strings.isEmpty(#strings.toString(theme.config.couple.partner_a_name)) ? '小坏蛋' : theme.config.couple.partner_a_name), 'partner_a_avatar': ((theme.config.couple?.partner_a_avatar == null) or #strings.isEmpty(#strings.toString(theme.config.couple.partner_a_avatar)) ? '' : theme.config.couple.partner_a_avatar), 'partner_a_emoji': ((theme.config.couple?.partner_a_emoji == null) or #strings.isEmpty(#strings.toString(theme.config.couple.partner_a_emoji)) ? '🐰' : theme.config.couple.partner_a_emoji), 'partner_a_tone': ((theme.config.couple?.partner_a_tone == null) or #strings.isEmpty(#strings.toString(theme.config.couple.partner_a_tone)) ? '#8fb7ff' : theme.config.couple.partner_a_tone), 'partner_b_name': ((theme.config.couple?.partner_b_name == null) or #strings.isEmpty(#strings.toString(theme.config.couple.partner_b_name)) ? '小乖乖' : theme.config.couple.partner_b_name), 'partner_b_avatar': ((theme.config.couple?.partner_b_avatar == null) or #strings.isEmpty(#strings.toString(theme.config.couple.partner_b_avatar)) ? '' : theme.config.couple.partner_b_avatar), 'partner_b_emoji': ((theme.config.couple?.partner_b_emoji == null) or #strings.isEmpty(#strings.toString(theme.config.couple.partner_b_emoji)) ? '🐱' : theme.config.couple.partner_b_emoji), 'partner_b_tone': ((theme.config.couple?.partner_b_tone == null) or #strings.isEmpty(#strings.toString(theme.config.couple.partner_b_tone)) ? '#ff8fae' : theme.config.couple.partner_b_tone), 'mast_heart': ((theme.config.couple?.mast_heart == null) or #strings.isEmpty(#strings.toString(theme.config.couple.mast_heart)) ? '' : theme.config.couple.mast_heart), 'mast_suffix': ((theme.config.couple?.mast_suffix == null) or #strings.isEmpty(#strings.toString(theme.config.couple.mast_suffix)) ? '' : theme.config.couple.mast_suffix), 'partner_a_author': ((theme.config.couple?.partner_a_author == null) or #strings.isEmpty(#strings.toString(theme.config.couple.partner_a_author)) ? '' : theme.config.couple.partner_a_author), 'partner_b_author': ((theme.config.couple?.partner_b_author == null) or #strings.isEmpty(#strings.toString(theme.config.couple.partner_b_author)) ? '' : theme.config.couple.partner_b_author) }, 'days': { 'anniversary_date': ((theme.config.days?.anniversary_date == null) or #strings.isEmpty(#strings.toString(theme.config.days.anniversary_date)) ? '2020-05-20' : theme.config.days.anniversary_date), 'timezone': ((theme.config.days?.timezone == null) or #strings.isEmpty(#strings.toString(theme.config.days.timezone)) ? '+08:00' : theme.config.days.timezone), 'celebrations': ((theme.config.days?.celebrations == null) or #lists.isEmpty(theme.config.days.celebrations) ? {} : theme.config.days.celebrations), 'milestones': ((theme.config.days?.milestones == null) or #lists.isEmpty(theme.config.days.milestones) ? {} : theme.config.days.milestones), 'daily_quotes': ((theme.config.days?.daily_quotes == null) or #strings.isEmpty(#strings.toString(theme.config.days.daily_quotes)) ? '今天的风很温柔，像你路过时一样。' : theme.config.days.daily_quotes), 'quote_api': ((theme.config.days?.quote_api == null) or #strings.isEmpty(#strings.toString(theme.config.days.quote_api)) ? '' : theme.config.days.quote_api), 'show_quote': ((theme.config.days?.show_quote == null) ? true : #strings.toString(theme.config.days.show_quote) == 'true'), 'live_time': ((theme.config.days?.live_time == null) ? true : #strings.toString(theme.config.days.live_time) == 'true'), 'show_anniv_countdown': ((theme.config.days?.show_anniv_countdown == null) ? true : #strings.toString(theme.config.days.show_anniv_countdown) == 'true') }, 'home': { 'list_layout': ((theme.config.home?.list_layout == null) or #strings.isEmpty(#strings.toString(theme.config.home.list_layout)) ? 'dual' : theme.config.home.list_layout), 'spread_mode': ((theme.config.home?.spread_mode == null) or #strings.isEmpty(#strings.toString(theme.config.home.spread_mode)) ? 'alternating' : theme.config.home.spread_mode), 'show_excerpt': ((theme.config.home?.show_excerpt == null) ? true : #strings.toString(theme.config.home.show_excerpt) == 'true'), 'list_density': ((theme.config.home?.list_density == null) or #strings.isEmpty(#strings.toString(theme.config.home.list_density)) ? 'cozy' : theme.config.home.list_density), 'view_toggle': ((theme.config.home?.view_toggle == null) ? true : #strings.toString(theme.config.home.view_toggle) == 'true'), 'seat_enabled': ((theme.config.home?.seat_enabled == null) ? true : #strings.toString(theme.config.home.seat_enabled) == 'true'), 'show_feature': ((theme.config.home?.show_feature == null) ? true : #strings.toString(theme.config.home.show_feature) == 'true'), 'show_channels': ((theme.config.home?.show_channels == null) ? true : #strings.toString(theme.config.home.show_channels) == 'true'), 'show_stock': ((theme.config.home?.show_stock == null) ? true : #strings.toString(theme.config.home.show_stock) == 'true'), 'show_otd': ((theme.config.home?.show_otd == null) ? true : #strings.toString(theme.config.home.show_otd) == 'true'), 'show_knot': ((theme.config.home?.show_knot == null) ? true : #strings.toString(theme.config.home.show_knot) == 'true') }, 'reading': { 'show_toc': ((theme.config.reading?.show_toc == null) ? true : #strings.toString(theme.config.reading.show_toc) == 'true'), 'show_stat': ((theme.config.reading?.show_stat == null) ? true : #strings.toString(theme.config.reading.show_stat) == 'true'), 'show_cover': ((theme.config.reading?.show_cover == null) ? true : #strings.toString(theme.config.reading.show_cover) == 'true') }, 'navigation': { 'menu_name': ((theme.config.navigation?.menu_name == null) or #strings.isEmpty(#strings.toString(theme.config.navigation.menu_name)) ? 'primary' : theme.config.navigation.menu_name), 'footer_style': ((theme.config.navigation?.footer_style == null) or #strings.isEmpty(#strings.toString(theme.config.navigation.footer_style)) ? 'compact' : theme.config.navigation.footer_style), 'show_footer_note': ((theme.config.navigation?.show_footer_note == null) ? true : #strings.toString(theme.config.navigation.show_footer_note) == 'true'), 'custom_footer_note': ((theme.config.navigation?.custom_footer_note == null) or #strings.isEmpty(#strings.toString(theme.config.navigation.custom_footer_note)) ? '' : theme.config.navigation.custom_footer_note) }, 'motion': { 'level': ((theme.config.motion?.level == null) or #strings.isEmpty(#strings.toString(theme.config.motion.level)) ? 'full' : theme.config.motion.level), 'scene': ((theme.config.motion?.scene == null) or #strings.isEmpty(#strings.toString(theme.config.motion.scene)) ? 'petals' : theme.config.motion.scene), 'cursor': ((theme.config.motion?.cursor == null) ? false : #strings.toString(theme.config.motion.cursor) == 'true'), 'density': ((theme.config.motion?.density == null) or #strings.isEmpty(#strings.toString(theme.config.motion.density)) ? 'normal' : theme.config.motion.density), 'auto_hide_topbar': ((theme.config.motion?.auto_hide_topbar == null) ? true : #strings.toString(theme.config.motion.auto_hide_topbar) == 'true') }, 'seo': { 'enable_metadata': ((theme.config.seo?.enable_metadata == null) ? false : #strings.toString(theme.config.seo.enable_metadata) == 'true') } } },
+    aToks = ${#strings.listSplit(cfg.couple.partner_a_author, ',')},
+    aTok = ${#lists.isEmpty(aToks) ? '' : #strings.trim(aToks[0])},
+    bToks = ${#strings.listSplit(cfg.couple.partner_b_author, ',')},
+    bTok = ${#lists.isEmpty(bToks) ? '' : #strings.trim(bToks[0])},
+    aStat = ${#strings.isEmpty(aTok) or #strings.contains(aTok, ',') ? null : postFinder.listByOwner(1, 1, aTok)},
+    bStat = ${#strings.isEmpty(bTok) or #strings.contains(bTok, ',') ? null : postFinder.listByOwner(1, 1, bTok)},
+    aCount = ${aStat == null ? -1 : aStat.total},
+    bCount = ${bStat == null ? -1 : bStat.total},
+    aAvU = ${aStat == null or #lists.isEmpty(aStat.items) or aStat.items[0].owner == null ? '' : aStat.items[0].owner.avatar},
+    bAvU = ${bStat == null or #lists.isEmpty(bStat.items) or bStat.items[0].owner == null ? '' : bStat.items[0].owner.avatar},
+    avA = ${#strings.isEmpty(cfg.couple.partner_a_avatar) ? aAvU : cfg.couple.partner_a_avatar},
+    avB = ${#strings.isEmpty(cfg.couple.partner_b_avatar) ? bAvU : cfg.couple.partner_b_avatar},
+    headCoverPosts = ${_templateId == 'index' and #ctx.containsVariable('posts') and posts != null and posts.items != null and !#lists.isEmpty(posts.items) ? posts.items.?[!#strings.isEmpty(spec.cover)] : null},
+    headCover = ${headCoverPosts == null or #lists.isEmpty(headCoverPosts) ? null : headCoverPosts[0]},
+    headCoverSizes = ${headCover == null ? '' : (cfg.home.list_layout == 'stamps' ? '(max-width: 860px) 46vw, 300px' : (cfg.home.list_layout == 'postcard' ? '(max-width: 860px) 92vw, 280px' : (cfg.home.list_layout == 'spread' ? '(max-width: 860px) 92vw, 420px' : (posts.items[0].metadata.name == headCover.metadata.name ? '(max-width: 860px) 92vw, 460px' : '(max-width: 860px) 92vw, 440px'))))}
+  "
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    <meta
+      th:if="${cfg.appearance.color_scheme == 'auto'}"
+      name="theme-color"
+      media="(prefers-color-scheme: light)"
+      content="#faf5ec"
+    />
+    <meta
+      th:if="${cfg.appearance.color_scheme == 'auto'}"
+      name="theme-color"
+      media="(prefers-color-scheme: dark)"
+      content="#1e1a17"
+    />
+    <meta th:if="${cfg.appearance.color_scheme == 'light'}" name="theme-color" content="#faf5ec" />
+    <meta th:if="${cfg.appearance.color_scheme == 'dark'}" name="theme-color" content="#1e1a17" />
+
+    
+    <title
+      th:if="${head == null}"
+      th:text="${pageTitleSafe != '' ? pageTitleSafe + ' · ' + site.title : site.title}"
+    >站点标题</title>
+    <th:block th:if="${head != null}">
+      <th:block th:replace="${head}" />
+    </th:block>
+
+    
+    <th:block th:if="${cfg.seo.enable_metadata}">
+      <th:block
+        th:if="${head == null}"
+        th:with="hasCover = ${#ctx.containsVariable('post') and post.spec.cover != null and !#strings.isEmpty(post.spec.cover)}, coverUrl = ${hasCover ? (#strings.startsWith(post.spec.cover, 'http') ? post.spec.cover : site.url + post.spec.cover) : ''}, hasLogo = ${site.logo != null and !#strings.isEmpty(site.logo)},
+        canonicalUrl = ${#ctx.containsVariable('post') and post != null ? (#strings.startsWith(post.status.permalink, 'http') ? post.status.permalink : site.url + post.status.permalink) : (#ctx.containsVariable('singlePage') and singlePage != null ? (#strings.startsWith(singlePage.status.permalink, 'http') ? singlePage.status.permalink : site.url + singlePage.status.permalink) : site.url)}"
+      >
+        <meta property="og:site_name" th:content="${site.title}" />
+        <meta property="og:title" th:content="${pageTitleSafe != '' ? pageTitleSafe + ' · ' + site.title : site.title}" />
+        <meta property="og:type" th:content="${_templateId == 'post' ? 'article' : 'website'}" />
+        <meta property="og:image" th:if="${hasCover}" th:content="${coverUrl}" />
+        
+        <meta property="og:image" th:if="${!hasCover and hasLogo}" th:content="${#strings.startsWith(site.logo, 'http') ? site.logo : site.url + site.logo}" />
+        <meta name="twitter:card" th:content="summary" />
+        
+        <link rel="canonical" th:href="${canonicalUrl}" />
+      </th:block>
+    </th:block>
+    
+    <th:block
+      th:if="${#ctx.containsVariable('post') and post != null and post.spec.htmlMetas != null and !#lists.isEmpty(post.spec.htmlMetas)}"
+    >
+      <meta
+        th:each="hm : ${post.spec.htmlMetas}"
+        th:if="${hm != null and hm.content != null and !#strings.isEmpty(hm.content) and (!#strings.isEmpty(hm.name) or !#strings.isEmpty(hm.property) or !#strings.isEmpty(hm['http-equiv']))}"
+        th:attr="name=${hm.name}, property=${hm.property}, content=${hm.content}, http-equiv=${hm['http-equiv']}"
+      />
+    </th:block>
+    
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      th:if="${head == null and pluginFinder.available('PluginFeed')}"
+      th:href="@{/rss.xml}"
+      th:title="${site.title}"
+    />
+
+    
+    <th:block th:if="${headCover != null}">
+      <th:block th:replace="~{modules/cover-preload :: link(${headCover.spec.cover}, ${headCoverSizes})}" />
+    </th:block>
+
+    
+    <link th:if="${true}" rel="stylesheet" th:href="@{/assets/css/main.css?v={version}(version=${theme.spec.version})}" />
+    <link th:if="${_templateId == 'post' or _templateId == 'page'}" rel="stylesheet" th:href="@{/assets/css/post.css?v={version}(version=${theme.spec.version})}" />
+    <link th:if="${_templateId == 'index'}" rel="stylesheet" th:href="@{/assets/css/index.css?v={version}(version=${theme.spec.version})}" />
+    <link th:if="${_templateId == 'links'}" rel="stylesheet" th:href="@{/assets/css/links.css?v={version}(version=${theme.spec.version})}" />
+    <link th:if="${_templateId == 'photos' or _templateId == 'photo'}" rel="stylesheet" th:href="@{/assets/css/photos.css?v={version}(version=${theme.spec.version})}" />
+    <link th:if="${_templateId == 'moments' or _templateId == 'moment'}" rel="stylesheet" th:href="@{/assets/css/moments.css?v={version}(version=${theme.spec.version})}" />
+    <link th:if="${#ctx.containsVariable('searchResult')}" rel="stylesheet" th:href="@{/assets/css/search.css?v={version}(version=${theme.spec.version})}" />
+    <script defer th:src="@{/assets/js/core.js?v={version}(version=${theme.spec.version})}"></script>
+    <th:block th:if="${_templateId == 'post' or _templateId == 'page'}">
+      <script defer th:src="@{/assets/js/post.js?v={version}(version=${theme.spec.version})}"></script>
+    </th:block>
+    <th:block th:if="${_templateId == 'photos' or _templateId == 'photo' or _templateId == 'moments' or _templateId == 'moment'}">
+      <script defer th:src="@{/assets/js/gallery.js?v={version}(version=${theme.spec.version})}"></script>
+    </th:block>
+    <th:block th:if="${cfg.motion.level != 'off' and (cfg.motion.scene != 'none' or cfg.motion.cursor)}">
+      <script defer th:src="@{/assets/js/ambient.js?v={version}(version=${theme.spec.version})}"></script>
+    </th:block>
+    <th:block th:if="${#ctx.containsVariable('searchResult')}">
+      <script defer th:src="@{/assets/js/search.js?v={version}(version=${theme.spec.version})}"></script>
+    </th:block>
+  
+    
+    <link rel="preconnect" href="https://registry.npmmirror.com" crossorigin />
+    <link rel="stylesheet" href="https://registry.npmmirror.com/lxgw-wenkai-screen-webfont/latest/files/style.css" />
+    
+    <link rel="stylesheet" href="https://registry.npmmirror.com/@fontsource/space-mono/latest/files/400.css" />
+    <link rel="stylesheet" href="https://registry.npmmirror.com/@fontsource/space-mono/latest/files/700.css" />
+    
+    <script>
+      document.documentElement.classList.add('wqs-js');
+      try {
+        var v = localStorage.getItem('wqs-view');
+        if (v === 'rabbit' || v === 'cat') document.documentElement.setAttribute('data-wqs-view', v);
+      } catch (e) {}
+      /* 配色模式（v7.3.16）：前端选择的明/暗优先于后台 color_scheme；
+         未选择时按后台配置走（auto 跟系统）。全部在第一帧完成，避免白闪。 */
+      (function () {
+        var root = document.documentElement;
+        var dark = root.classList.contains('t-scheme-dark');
+        var forced = null;
+        try {
+          forced = localStorage.getItem('wqs-scheme');
+        } catch (e) {}
+        if (forced === 'dark') dark = true;
+        else if (forced === 'light') dark = false;
+        else if (root.classList.contains('t-scheme-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches) dark = true;
+        root.classList.toggle('t-scheme-dark', dark);
+        root.style.colorScheme = dark ? 'dark' : 'light';
+      })();
+    </script>
+  </head>
+
+  <body
+    th:with="
+      navMenus = ${menuFinder.getByNames({#strings.trim(cfg.navigation.menu_name)})},
+      primaryMenu = ${#lists.isEmpty(navMenus) ? null : navMenus[0]}
+    "
+  >
+    
+    <a class="t-skip" href="#t-main" th:text="${#messages.msg('a11y.skip')}">跳到正文</a>
+
+    
+    <th:block th:with="todayMD = ${#temporals.format(#temporals.createNow(), 'MM-dd')}, feteList = ${cfg.days.celebrations}">
+      <div
+        class="wqs-fete"
+        th:if="${!#lists.isEmpty(feteList) and #lists.contains(feteList, todayMD)}"
+        th:aria-label="${#messages.msg('a11y.fete')}"
+      >
+        <span aria-hidden="true">🎊</span>
+        <span th:text="${#messages.msg('fete.banner')}">今天是值得庆祝的日子</span>
+        <span aria-hidden="true">·</span>
+        <span th:text="${#messages.msg('ms.dayPrefix')}">第</span>
+        <b class="tabular" data-wqs-daycount>--</b>
+        <span th:text="${#messages.msg('ms.daySuffix')}">天</span>
+      </div>
+    </th:block>
+
+    
+    <header class="t-topbar">
+      <div class="t-topbar__in">
+        <a class="t-topbar__brand" th:href="@{/}" th:title="${site.title}">
+          <span class="wqs-halo" aria-hidden="true">
+            <span class="wqs-halo__av">
+              <img data-wqs-avatar th:if="${!#strings.isEmpty(avA)}" th:src="${avA}" th:attr="data-wqs-avatar-emoji=${cfg.couple.partner_a_emoji}" th:alt="${cfg.couple.partner_a_name}" />
+              <span th:if="${#strings.isEmpty(avA)}" th:text="${cfg.couple.partner_a_emoji}">🐰</span>
+            </span>
+            <span class="wqs-halo__av">
+              <img data-wqs-avatar th:if="${!#strings.isEmpty(avB)}" th:src="${avB}" th:attr="data-wqs-avatar-emoji=${cfg.couple.partner_b_emoji}" th:alt="${cfg.couple.partner_b_name}" />
+              <span th:if="${#strings.isEmpty(avB)}" th:text="${cfg.couple.partner_b_emoji}">🐱</span>
+            </span>
+          </span>
+          <b class="t-topbar__brandname">
+            <span th:text="${cfg.couple.partner_a_name}">A</span>
+            <span aria-hidden="true">·</span>
+            <span th:text="${cfg.couple.partner_b_name}">B</span>
+          </b>
+        </a>
+
+        
+        <nav class="t-topbar__menu" th:aria-label="${#messages.msg('a11y.mainNav')}" th:if="${primaryMenu != null and !#lists.isEmpty(primaryMenu.menuItems)}">
+          <span
+            class="t-topbar__group"
+            th:each="item : ${primaryMenu.menuItems}"
+            th:classappend="${!#lists.isEmpty(item.children)} ? 't-topbar__group--more'"
+            th:attr="data-wqs-navgroup=${item.metadata.name}"
+          >
+            <a
+              th:href="@{${item.status.href}}"
+              th:target="${item.spec.target != null ? item.spec.target.value : null}"
+              th:attr="rel=${item.spec.target != null and item.spec.target.value == '_blank' ? 'noopener noreferrer' : null}"
+              th:text="${item.status.displayName}"
+            >菜单项</a>
+            <button
+              th:if="${!#lists.isEmpty(item.children)}"
+              type="button"
+              class="t-topbar__more"
+              aria-expanded="false"
+              th:attr="aria-controls=|navdrop-${item.metadata.name}|,data-wqs-navtoggle=${item.metadata.name}"
+              th:aria-label="${#messages.msg('a11y.submenu', item.status.displayName)}"
+            >
+              <svg viewBox="0 0 12 12" aria-hidden="true">
+                <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </span>
+        </nav>
+        
+        <div class="t-navdrop" data-wqs-navdrop hidden th:if="${primaryMenu != null}">
+          <th:block th:each="item : ${primaryMenu.menuItems}">
+            <div
+              class="t-navdrop__panel"
+              th:if="${!#lists.isEmpty(item.children)}"
+              th:id="|navdrop-${item.metadata.name}|"
+              data-wqs-navpanel
+              hidden
+            >
+              <p class="t-navdrop__head" th:text="${item.status.displayName}">看看</p>
+              <a
+                th:each="child : ${item.children}"
+                th:href="@{${child.status.href}}"
+                th:target="${child.spec.target != null ? child.spec.target.value : null}"
+                th:attr="rel=${child.spec.target != null and child.spec.target.value == '_blank' ? 'noopener noreferrer' : null}"
+                th:text="${child.status.displayName}"
+              >分类</a>
+            </div>
+          </th:block>
+        </div>
+        <nav class="t-topbar__menu" th:aria-label="${#messages.msg('a11y.mainNav')}" th:if="${primaryMenu == null or #lists.isEmpty(primaryMenu.menuItems)}">
+          <a th:href="@{/archives}" th:text="${#messages.msg('page.archives')}">归档</a>
+          <a th:href="@{/categories}" th:text="${#messages.msg('page.categories')}">分类</a>
+          <a th:href="@{/tags}" th:text="${#messages.msg('page.tags')}">标签</a>
+          <a th:if="${pluginFinder.available('PluginLinks')}" th:href="@{/links}" th:text="${#messages.msg('a11y.links')}">友链</a>
+          <a th:if="${pluginFinder.available('PluginPhotos')}" th:href="@{/photos}" th:text="${#messages.msg('a11y.photos')}">相册</a>
+          <a th:if="${pluginFinder.available('PluginMoments')}" th:href="@{/moments}" th:text="${#messages.msg('a11y.moments')}">瞬间</a>
+        </nav>
+
+        <div class="t-topbar__actions">
+          
+          <th:block th:if="${cfg.home.view_toggle}">
+            <span class="t-viewtg__cap" aria-hidden="true" th:text="${#messages.msg('view.label')}">视角</span>
+            <div class="t-viewtg" role="group" th:aria-label="${#messages.msg('a11y.viewToggle')}" data-wqs-viewtg>
+              <button type="button" data-wqs-view-opt="rabbit" aria-pressed="false" th:title="${cfg.couple.partner_a_name}" th:aria-label="${cfg.couple.partner_a_name}">
+                <span th:if="${#strings.isEmpty(avA)}" th:text="${cfg.couple.partner_a_emoji}">🐰</span>
+                <img data-wqs-avatar th:if="${!#strings.isEmpty(avA)}" th:src="${avA}" th:attr="data-wqs-avatar-emoji=${cfg.couple.partner_a_emoji}" th:alt="${cfg.couple.partner_a_name}" />
+              </button>
+              <button type="button" data-wqs-view-opt="cat" aria-pressed="false" th:title="${cfg.couple.partner_b_name}" th:aria-label="${cfg.couple.partner_b_name}">
+                <span th:if="${#strings.isEmpty(avB)}" th:text="${cfg.couple.partner_b_emoji}">🐱</span>
+                <img data-wqs-avatar th:if="${!#strings.isEmpty(avB)}" th:src="${avB}" th:attr="data-wqs-avatar-emoji=${cfg.couple.partner_b_emoji}" th:alt="${cfg.couple.partner_b_name}" />
+              </button>
+            </div>
+          </th:block>
+          
+          <button
+            type="button"
+            class="t-scheme"
+            data-wqs-scheme
+            data-mode="auto"
+            th:aria-label="${#messages.msg('a11y.colorMode')}"
+            th:title="${#messages.msg('a11y.colorMode')}"
+            th:attr="data-auto=${#messages.msg('scheme.auto')}, data-light=${#messages.msg('scheme.light')}, data-dark=${#messages.msg('scheme.dark')}"
+          >
+            <svg class="t-scheme__ico t-scheme__ico--auto" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="8" />
+              <path d="M12 4a8 8 0 0 1 0 16Z" fill="currentColor" stroke="none" />
+            </svg>
+            <svg class="t-scheme__ico t-scheme__ico--light" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <circle cx="12" cy="12" r="4.5" />
+              <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4" />
+            </svg>
+            <svg class="t-scheme__ico t-scheme__ico--dark" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+              <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" />
+            </svg>
+          </button>
+          
+          <button
+            type="button"
+            class="t-search"
+            th:if="${pluginFinder.available('PluginSearchWidget')}"
+            data-wqs-search
+            th:aria-label="${#messages.msg('a11y.search')}"
+            th:title="${#messages.msg('a11y.search')}"
+          >
+            <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-4-4" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    
+    <div class="wqs-strip" th:if="${_templateId != 'index'}">
+      <div class="wqs-strip__inner">
+        <span class="wqs-halo" aria-hidden="true">
+          <span class="wqs-halo__av">
+            <img th:if="${!#strings.isEmpty(avA)}" th:src="${avA}" th:alt="${cfg.couple.partner_a_name}" />
+            <span th:if="${#strings.isEmpty(avA)}" th:text="${cfg.couple.partner_a_emoji}">🐰</span>
+          </span>
+          <span class="wqs-halo__av">
+            <img th:if="${!#strings.isEmpty(avB)}" th:src="${avB}" th:alt="${cfg.couple.partner_b_name}" />
+            <span th:if="${#strings.isEmpty(avB)}" th:text="${cfg.couple.partner_b_emoji}">🐱</span>
+          </span>
+        </span>
+        <p class="wqs-strip__names">
+          <span th:text="${cfg.couple.partner_a_name}">A</span>
+          <span aria-hidden="true">·</span>
+          <span th:text="${cfg.couple.partner_b_name}">B</span>
+        </p>
+        <p class="wqs-strip__day">
+          <span th:text="${#messages.msg('ms.dayPrefix')}">第</span>
+          <b class="tabular" data-wqs-daycount>--</b>
+          <span th:text="${#messages.msg('ms.daySuffix')}">天</span>
+        </p>
+      </div>
+    </div>
+
+    
+    <main class="t-main" id="t-main">
+      <div class="t-content" th:insert="${content}"></div>
+    </main>
+
+    
+    
+    <footer class="t-footer" th:classappend="| t-footer--${cfg.navigation.footer_style}|">
+      <div class="t-footer__in">
+        
+        <p
+          class="t-footer__slogan"
+          th:if="${cfg.navigation.footer_style != 'minimal' and cfg.navigation.show_footer_note}"
+          th:text="${!#strings.isEmpty(cfg.navigation.custom_footer_note) ? cfg.navigation.custom_footer_note : #messages.msg('footer.slogan')}"
+        >两个人，写个不停。</p>
+        <div class="t-footer__links">
+          
+          <button
+            type="button"
+            class="t-footer__share"
+            data-wqs-share
+            th:attr="data-wqs-share-copied=${#messages.msg('share.copied')}, data-wqs-share-fail=${#messages.msg('share.fail')}"
+          >
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="18" cy="5" r="2.6" />
+              <circle cx="6" cy="12" r="2.6" />
+              <circle cx="18" cy="19" r="2.6" />
+              <path d="m8.4 10.7 7.2-4.2M8.4 13.3l7.2 4.2" />
+            </svg>
+            <span
+              data-wqs-share-label
+              aria-live="polite"
+              th:text="${_templateId == 'post' ? #messages.msg('share.post') : #messages.msg('share.page')}"
+            >分享这一页</span>
+          </button>
+          <a
+            class="t-footer__rss"
+            th:if="${pluginFinder.available('PluginFeed')}"
+            th:href="@{/rss.xml}"
+            th:aria-label="${#messages.msg('common.rss')}"
+          >
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+              <path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16" />
+              <circle cx="5" cy="19" r="1.6" fill="currentColor" stroke="none" />
+            </svg>
+            <span th:text="${#messages.msg('common.rss')}">RSS 订阅</span>
+          </a>
+          <a class="t-footer__top" href="#" th:aria-label="${#messages.msg('a11y.top')}">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 20V5m0 0-6 6m6-6 6 6" />
+            </svg>
+            <span th:text="${#messages.msg('a11y.top')}">回到顶部</span>
+          </a>
+        </div>
+        
+        <div class="t-footer__sig" th:if="${cfg.navigation.footer_style == 'full'}">
+          <div class="t-footer__col t-footer__col--a">
+            <span class="t-footer__id">
+              <span class="wqs-halo__av wqs-mono" data-wqs-mono="a" aria-hidden="true">
+                <img th:if="${!#strings.isEmpty(avA)}" th:src="${avA}" alt="" />
+                <span class="wqs-mono__emoji" th:text="${cfg.couple.partner_a_emoji}" aria-hidden="true">🐰</span>
+                
+                <span class="wqs-mono__ch" aria-hidden="true"></span>
+              </span>
+              <span class="t-footer__name" th:text="${cfg.couple.partner_a_name}">A</span>
+            </span>
+            <span class="t-footer__meta">
+              <span class="t-footer__count" th:if="${aCount > 0}">
+                <span th:text="${#messages.msg('footer.wrote')}">写了</span>
+                <b class="tabular" th:text="${aCount}">89</b>
+                <span th:text="${#messages.msg('stats.posts')}">封信</span>
+              </span>
+              <a
+                class="t-footer__desk"
+                th:if="${!#strings.isEmpty(aTok)}"
+                th:href="@{|/authors/${aTok}|}"
+              >
+                <span th:text="${#messages.msg('footer.desk')}">去 TA 的信桌</span>
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M5 12h14m0 0-6-6m6 6-6 6" />
+                </svg>
+              </a>
+            </span>
+          </div>
+          <span class="t-footer__spine" aria-hidden="true">
+            
+            <svg class="t-footer__crest" viewBox="0 0 160 84">
+              <ellipse cx="62" cy="42" rx="40" ry="16" fill="none" stroke="var(--wqs-tone-a)" stroke-width="1.5" transform="rotate(-10 62 42)" opacity="0.8"/>
+              <ellipse cx="98" cy="42" rx="40" ry="16" fill="none" stroke="var(--wqs-tone-b)" stroke-width="1.5" transform="rotate(10 98 42)" opacity="0.8"/>
+              <path d="M80 52.5l-.9-.82c-3.2-2.9-5.3-4.8-5.3-7.2 0-1.9 1.5-3.4 3.4-3.4 1.1 0 2.1.5 2.8 1.3.7-.8 1.7-1.3 2.8-1.3 1.9 0 3.4 1.5 3.4 3.4 0 2.4-2.1 4.3-5.3 7.2l-.9.82z" fill="var(--t-wax)"/>
+            </svg>
+          </span>
+          <div class="t-footer__col t-footer__col--b">
+            <span class="t-footer__id">
+              <span class="wqs-halo__av wqs-halo__av--b wqs-mono" data-wqs-mono="b" aria-hidden="true">
+                <img th:if="${!#strings.isEmpty(avB)}" th:src="${avB}" alt="" />
+                <span class="wqs-mono__emoji" th:text="${cfg.couple.partner_b_emoji}" aria-hidden="true">🐱</span>
+                <span class="wqs-mono__ch" aria-hidden="true"></span>
+              </span>
+              <span class="t-footer__name" th:text="${cfg.couple.partner_b_name}">B</span>
+            </span>
+            <span class="t-footer__meta">
+              <span class="t-footer__count" th:if="${bCount > 0}">
+                <span th:text="${#messages.msg('footer.wrote')}">写了</span>
+                <b class="tabular" th:text="${bCount}">44</b>
+                <span th:text="${#messages.msg('stats.posts')}">封信</span>
+              </span>
+              <a
+                class="t-footer__desk"
+                th:if="${!#strings.isEmpty(bTok)}"
+                th:href="@{|/authors/${bTok}|}"
+              >
+                <span th:text="${#messages.msg('footer.desk')}">去 TA 的信桌</span>
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M5 12h14m0 0-6-6m6 6-6 6" />
+                </svg>
+              </a>
+            </span>
+          </div>
+        </div>
+        <p class="t-footer__fine">
+          <span aria-hidden="true">© </span><span class="tabular" th:text="${#temporals.format(#temporals.createNow(), 'yyyy')}">2026</span>
+          <span th:text="${site.title}">站点名</span>
+          <th:block th:if="${!#strings.isEmpty(site.subtitle) and site.subtitle != cfg.navigation.custom_footer_note}">
+            <span aria-hidden="true"> · </span>
+            <span th:text="${site.subtitle}">站点副标题</span>
+          </th:block>
+          <span aria-hidden="true"> · </span>
+          <span th:text="${#messages.msg('common.poweredBy')}">由 Halo 驱动</span>
+        </p>
+      </div>
+      
+      <halo:footer />
+    </footer>
+  </body>
+</html>
+
+
+<th:block
+  th:fragment="chead(label)"
+  th:with="headAvA=${#ctx.containsVariable('avA') ? avA : cfg.couple.partner_a_avatar}, headAvB=${#ctx.containsVariable('avB') ? avB : cfg.couple.partner_b_avatar}"
+>
+  <div class="wqs-chead">
+    <p class="wqs-chead__kicker">
+      <i class="wqs-chead__dia" aria-hidden="true"></i>
+      <span th:text="|${site.title} · ${label}|">站点名 · 页面名</span>
+      <i class="wqs-chead__dia" aria-hidden="true"></i>
+    </p>
+    <span class="wqs-halo wqs-chead__pair" aria-hidden="true">
+      <span class="wqs-halo__av">
+        <img th:if="${!#strings.isEmpty(headAvA)}" th:src="${headAvA}" alt="" />
+        <span th:if="${#strings.isEmpty(headAvA)}" th:text="${cfg.couple.partner_a_emoji}">🐰</span>
+      </span>
+      <span class="wqs-halo__av">
+        <img th:if="${!#strings.isEmpty(headAvB)}" th:src="${headAvB}" alt="" />
+        <span th:if="${#strings.isEmpty(headAvB)}" th:text="${cfg.couple.partner_b_emoji}">🐱</span>
+      </span>
+    </span>
+  </div>
+</th:block>

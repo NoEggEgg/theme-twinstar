@@ -1,0 +1,31 @@
+
+<th:block th:fragment="stream(posts, aMap, bMap, eagerName, rnd)">
+  <section class="wqs-stream wqs-stream--wall" th:aria-label="${#messages.msg('a11y.latestPosts')}">
+    <div class="wqs-wall">
+      <th:block th:each="post, cardStat : ${posts.items}">
+        <th:block
+          th:with="
+            isA = ${post.owner != null and (#strings.contains(aMap, ',' + post.owner.metadata.name + ',') or #strings.contains(aMap, ',' + post.owner.displayName + ',') or post.owner.displayName == cfg.couple.partner_a_name or (!#strings.isEmpty(cfg.couple.partner_a_name) and (#strings.contains(#strings.trim(post.owner.displayName), #strings.trim(cfg.couple.partner_a_name)) or #strings.contains(#strings.trim(cfg.couple.partner_a_name), #strings.trim(post.owner.displayName)))))},
+            isB = ${post.owner != null and !isA and (#strings.contains(bMap, ',' + post.owner.metadata.name + ',') or #strings.contains(bMap, ',' + post.owner.displayName + ',') or post.owner.displayName == cfg.couple.partner_b_name or (!#strings.isEmpty(cfg.couple.partner_b_name) and (#strings.contains(#strings.trim(post.owner.displayName), #strings.trim(cfg.couple.partner_b_name)) or #strings.contains(#strings.trim(cfg.couple.partner_b_name), #strings.trim(post.owner.displayName)))))},
+            ownerName = ${post.owner != null ? post.owner.displayName : ''},
+            whoName = ${isA ? cfg.couple.partner_a_name : (isB ? cfg.couple.partner_b_name : ownerName)},
+            hasCover = ${!#strings.isEmpty(post.spec.cover)},
+            cfgAv = ${isA ? cfg.couple.partner_a_avatar : cfg.couple.partner_b_avatar},
+            ownerAv = ${post.owner != null ? post.owner.avatar : ''},
+            avatarSrc = ${#strings.isEmpty(cfgAv) ? ownerAv : cfgAv},
+            side = ${cardStat.index % 2 == 0 ? 'l' : 'r'}
+          "
+        >
+          <th:block
+            th:replace="~{modules/index/card-postcard :: card(${post}, ${cardStat}, ${isA}, ${hasCover}, ${ownerName}, ${whoName}, ${avatarSrc}, ${side}, ${eagerName})}"
+          />
+        </th:block>
+      </th:block>
+    </div>
+  </section>
+
+  
+  <th:block th:if="${cfg.home.show_knot}">
+    <th:block th:replace="~{modules/index/knot :: knot(${rnd}, ${posts})}" />
+  </th:block>
+</th:block>

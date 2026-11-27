@@ -1,0 +1,68 @@
+
+<th:block th:fragment="stream(posts, aMap, bMap, aTok, bTok, aCount, bCount, rnd, eagerName)">
+  <section
+    class="wqs-stream wqs-stream--dual is-cols"
+    th:aria-label="${#messages.msg('a11y.latestPosts')}"
+    th:attr="data-wqs-letter-unit=${#messages.msg('stats.posts')}"
+  >
+    
+    <th:block th:each="post, cardStat : ${posts.items}" th:if="${cardStat.first and cfg.home.show_feature}">
+      <th:block
+        th:replace="~{modules/index/card-dual :: row(${post}, ${cardStat}, 'full', ${aMap}, ${bMap}, ${eagerName})}"
+      />
+    </th:block>
+
+    
+    <div class="wqs-dualcol wqs-dualcol--a">
+      <th:block th:if="${cfg.home.seat_enabled}">
+        <div class="wqs-row wqs-row--seat wqs-row--l" hidden>
+          <th:block
+            th:replace="~{modules/index/seat :: seat('a', ${cfg.couple.partner_a_name}, ${cfg.couple.partner_a_emoji}, ${cfg.couple.partner_a_avatar}, ${aCount}, ${aTok})}"
+          />
+        </div>
+      </th:block>
+      <th:block th:each="post, cardStat : ${posts.items}" th:if="${!cardStat.first or !cfg.home.show_feature}">
+        <th:block
+          th:replace="~{modules/index/card-dual :: row(${post}, ${cardStat}, 'a', ${aMap}, ${bMap}, ${eagerName})}"
+        />
+      </th:block>
+      <div class="wqs-fill" data-wqs-fill="a" hidden>
+        <th:block
+          th:replace="~{modules/index/seat :: deskcard('a', ${cfg.couple.partner_a_name}, ${cfg.couple.partner_a_emoji}, ${cfg.couple.partner_a_avatar}, ${aCount}, ${aTok})}"
+        />
+        <div class="wqs-fill__blank" aria-hidden="true">
+          <span th:text="${#messages.msg('desk.blank')}">留给下一封</span>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="wqs-dualcol wqs-dualcol--b">
+      <th:block th:if="${cfg.home.seat_enabled}">
+        <div class="wqs-row wqs-row--seat wqs-row--r" hidden>
+          <th:block
+            th:replace="~{modules/index/seat :: seat('b', ${cfg.couple.partner_b_name}, ${cfg.couple.partner_b_emoji}, ${cfg.couple.partner_b_avatar}, ${bCount}, ${bTok})}"
+          />
+        </div>
+      </th:block>
+      <th:block th:each="post, cardStat : ${posts.items}" th:if="${!cardStat.first or !cfg.home.show_feature}">
+        <th:block
+          th:replace="~{modules/index/card-dual :: row(${post}, ${cardStat}, 'b', ${aMap}, ${bMap}, ${eagerName})}"
+        />
+      </th:block>
+      <div class="wqs-fill" data-wqs-fill="b" hidden>
+        <th:block
+          th:replace="~{modules/index/seat :: deskcard('b', ${cfg.couple.partner_b_name}, ${cfg.couple.partner_b_emoji}, ${cfg.couple.partner_b_avatar}, ${bCount}, ${bTok})}"
+        />
+        <div class="wqs-fill__blank" aria-hidden="true">
+          <span th:text="${#messages.msg('desk.blank')}">留给下一封</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <th:block th:if="${cfg.home.show_knot}">
+    <th:block th:replace="~{modules/index/knot :: knot(${rnd}, ${posts})}" />
+  </th:block>
+</th:block>

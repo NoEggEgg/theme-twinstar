@@ -1,0 +1,39 @@
+apiVersion: theme.halo.run/v1alpha1
+kind: Theme
+metadata:
+  name: theme-twinstar
+spec:
+  displayName: 双星记
+  author:
+    name: 子青雨
+    website: https://wuqishi.com
+  description: >-
+    双星记 —— Halo 情侣博客主题。双人署名与对页信流、报头「在一起第 N 天」、
+    信 / 相 / 瞬间库存、随机旧信与时间胶囊；内置瞬间时间线、相册灯箱、
+    四版式首页与自动目录，后台分组可调，未装插件自动缺项。
+  # 主题 Logo（Console 展示用）：双星轨道标识，源文件 src/templates/assets/logo.svg，
+  # 由 copy-templates 复制到 templates/assets/logo.svg。
+  logo: /themes/theme-twinstar/assets/logo.svg
+  homepage: https://wuqishi.com
+  repo: https://github.com/NoEggEgg/theme-twinstar
+  # ⚠️ >=2.27.0 的依据：layout.html 用 menuFinder.getByNames([...]) 安全读取
+  #   后台命名的菜单（缺失菜单返回空而不会 404，2.27.0 起提供）；
+  #   同时保留 2.26 起的页面布局契约 th:fragment="html (head, content)"。
+  requires: ">=2.27.0"
+  # ⚠️ settingName / configMapName 必须与 metadata.name 对应，实例内不得与他主题重名
+  #   （ThemeReconciler 全局处理，重名会中止整轮 reconcile，theme-Flux 51 主题实例实证）。
+  settingName: "theme-twinstar-setting"
+  configMapName: "theme-twinstar-configMap"
+  version: 0.1.0
+  # 时间胶囊页（M3）：Console「页面 → 模板」下拉可选「时间胶囊」。
+  # ⚠️ file 必须带 .html 后缀（HANDBOOK 官方合同；该值原样写入 SinglePage.spec.template）。
+  customTemplates:
+    page:
+      - name: 时间胶囊
+        file: page-capsule.html
+      - name: 我们的故事
+        file: page-story.html
+      - name: 搜索页
+        file: search.html
+  license:
+    - name: MIT

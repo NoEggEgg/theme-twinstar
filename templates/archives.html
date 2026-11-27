@@ -1,0 +1,62 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(content = ~{::content}, pageTitle = ${#messages.msg('page.archives')})}"
+>
+  
+
+  <th:block
+    th:fragment="content"
+    th:with="aMap = ${',' + #strings.replace(cfg.couple.partner_a_author, ' ', '') + ','}"
+  >
+  <th:block th:replace="~{modules/layout :: chead(label=${#messages.msg('page.archives')})}" />
+    
+    <p class="wqs-archive__meta" th:if="${archives.totalPages > 0}" role="status">
+      <span th:text="${#messages.msg('archives.summary', archives.total)}">共 142 封信</span>
+    </p>
+    <th:block th:each="a : ${archives.items}">
+      <section class="wqs-tl">
+        <h2 class="wqs-tl__year">
+          <span class="wqs-tl__yeartext" th:text="${#messages.msg('archives.year', a.year)}">2026 年</span>
+          
+          <span class="wqs-tl__yearunit" th:text="${#messages.msg('archives.exchange')}">往来</span>
+          <b class="wqs-tl__yearcount tabular" th:attr="data-wqs-yearcount=${a.year}">--</b>
+          <span class="wqs-tl__yearunit" th:text="${#messages.msg('stats.posts')}">封信</span>
+        </h2>
+        <ol class="wqs-tl__list">
+          <th:block th:each="m : ${a.months}">
+            
+            <li class="wqs-tl__month" th:if="${!#lists.isEmpty(m.posts)}">
+              <span class="tabular" th:text="${#messages.msg('archives.month', m.month)}">11 月</span>
+            </li>
+            <th:block th:each="p : ${m.posts}">
+              <li
+                class="wqs-tl__item"
+                th:attr="data-wqs-year=${a.year}"
+                th:with="
+                  isA = ${p.owner != null and (#strings.contains(aMap, ',' + p.owner.metadata.name + ',') or #strings.contains(aMap, ',' + p.owner.displayName + ',') or p.owner.displayName == cfg.couple.partner_a_name or (!#strings.isEmpty(cfg.couple.partner_a_name) and (#strings.contains(#strings.trim(p.owner.displayName), #strings.trim(cfg.couple.partner_a_name)) or #strings.contains(#strings.trim(cfg.couple.partner_a_name), #strings.trim(p.owner.displayName)))))}
+                "
+                th:classappend="${'wqs-tl__item--' + (isA ? 'l is-a' : 'r is-b')}"
+              >
+                <time
+                  class="wqs-tl__date tabular"
+                  th:attr="datetime=${p.spec.publishTime}"
+                  th:text="${#temporals.format(p.spec.publishTime, 'MM-dd')}"
+                >05-20</time>
+                <a class="wqs-tl__title" th:href="@{${p.status.permalink}}" th:text="${p.spec.title}">文章标题</a>
+                <span
+                  class="wqs-tl__who"
+                  th:classappend="${isA ? 'is-a' : 'is-b'}"
+                  th:text="${p.owner != null ? p.owner.displayName : ''}"
+                >作者</span>
+              </li>
+            </th:block>
+          </th:block>
+        </ol>
+      </section>
+    </th:block>
+    <p class="t-empty" role="status" th:if="${#lists.isEmpty(archives.items)}" th:text="${#messages.msg('common.noPosts')}">第一封信还在路上。</p>
+    
+    <th:block th:replace="~{modules/pager :: pager(base='/archives', pageNo=${archives.page}, totalNo=${archives.totalPages})}" />
+  </th:block>
+</html>

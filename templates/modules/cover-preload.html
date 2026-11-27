@@ -1,0 +1,25 @@
+
+<th:block
+  th:fragment="link(url, sizes)"
+  th:with="
+    isUp = ${#strings.contains(url, 'cdn.ssslove.com') and !#strings.endsWith(url, '.avif')},
+    isCf = ${#strings.contains(url, 'cdn.wuqishi.com')},
+    canResize = ${isUp or isCf or #strings.contains(url, '/upload/')},
+    upBase = ${#strings.contains(url, '!') ? #strings.substring(url, 0, #strings.indexOf(url, '!')) : url},
+    cfPath = ${isCf ? #strings.substringAfter(url, 'cdn.wuqishi.com') : ''},
+    w400 = ${isUp ? upBase + '!/fw/400' : (isCf ? 'https://cdn.wuqishi.com/cdn-cgi/image/width=400,format=auto,quality=82' + cfPath : thumbnail.gen(url, 's'))},
+    w800 = ${isUp ? upBase + '!/fw/800' : (isCf ? 'https://cdn.wuqishi.com/cdn-cgi/image/width=800,format=auto,quality=82' + cfPath : thumbnail.gen(url, 'm'))},
+    w960 = ${isUp ? upBase + '!/fw/960' : (isCf ? 'https://cdn.wuqishi.com/cdn-cgi/image/width=960,format=auto,quality=82' + cfPath : '')},
+    w1200 = ${isUp ? upBase + '!/fw/1200' : (isCf ? 'https://cdn.wuqishi.com/cdn-cgi/image/width=1200,format=auto,quality=82' + cfPath : thumbnail.gen(url, 'l'))},
+    mid = ${isUp or isCf ? w960 + ' 960w, ' : ''}"
+>
+  <link
+    th:if="${!#strings.isEmpty(url)}"
+    rel="preload"
+    as="image"
+    fetchpriority="high"
+    th:href="${canResize ? w800 : url}"
+    th:imagesrcset="${canResize ? w400 + ' 400w, ' + w800 + ' 800w, ' + mid + w1200 + ' 1200w' : null}"
+    th:imagesizes="${canResize ? sizes : null}"
+  />
+</th:block>

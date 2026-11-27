@@ -1,0 +1,42 @@
+
+<th:block th:fragment="otd(allPosts, todayMD, thisYear)">
+  <svg class="wqs-otd__defs" aria-hidden="true" focusable="false">
+    <defs>
+      <path id="wqs-otd-ring" d="M50,50 m-36,0 a36,36 0 1,1 72,0 a36,36 0 1,1 -72,0" />
+    </defs>
+  </svg>
+  <th:block th:each="p : ${allPosts}">
+    <article
+      class="wqs-otd"
+      th:if="${p.spec.publishTime != null and #temporals.format(p.spec.publishTime, 'MM-dd') == todayMD and #temporals.format(p.spec.publishTime, 'yyyy') != thisYear}"
+      th:with="yearsAgo=${p.spec.publishTime == null ? 0 : T(java.lang.Integer).parseInt(thisYear) - T(java.lang.Integer).parseInt(#temporals.format(p.spec.publishTime, 'yyyy'))}"
+      th:attr="data-wqs-otd-pub=${#temporals.format(p.spec.publishTime, 'yyyy-MM-dd')}, data-wqs-otd-last=${#messages.msg('otd.lastYear')}, data-wqs-otd-ago=${#messages.msg('otd.yearsAgo', yearsAgo)}"
+    >
+      <svg class="wqs-otd__mark" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="47" fill="none" stroke="currentColor" stroke-width="1.6" />
+        <circle cx="50" cy="50" r="26" fill="none" stroke="currentColor" stroke-width="1" />
+        <text font-size="8.4" letter-spacing="1.4" fill="currentColor">
+          <textPath href="#wqs-otd-ring" th:text="|${#messages.msg('otd.tag')} · ${#messages.msg('otd.tag')} · ${#messages.msg('otd.tag')} · |">那年今天 · 那年今天 · 那年今天 · </textPath>
+        </text>
+        <text x="50" y="47" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor" font-family="'Space Mono', monospace">
+          <th:block th:text="${#temporals.format(#temporals.createNow(), 'MM.dd')}">11.14</th:block>
+        </text>
+        <text x="50" y="62" text-anchor="middle" font-size="9" fill="currentColor" font-family="'LXGW WenKai Screen', serif">
+          <th:block th:text="${#temporals.format(p.spec.publishTime, 'yyyy')}">2024</th:block>
+        </text>
+      </svg>
+      <div class="wqs-otd__body">
+        <p class="wqs-otd__tag" th:text="${#messages.msg('otd.tag')}">那年今天</p>
+        <p class="wqs-otd__line">
+          <span
+            class="wqs-otd__prefix"
+            th:text="${#messages.msg('otd.yearsAgo', yearsAgo)}"
+          >两年前的今天，写过</span>
+          <a class="wqs-otd__title" th:href="@{${p.status.permalink}}" th:text="${p.spec.title}">那年今天的文章</a>
+          <span class="wqs-otd__date tabular" th:text="${#temporals.format(p.spec.publishTime, 'yyyy-MM-dd')}">2024-11-14</span>
+          <span class="wqs-otd__go" aria-hidden="true">→</span>
+        </p>
+      </div>
+    </article>
+  </th:block>
+</th:block>

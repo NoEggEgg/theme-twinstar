@@ -1,0 +1,50 @@
+
+<th:block th:fragment="strips(aTok, bTok, aCount, bCount)">
+  <th:block
+    th:replace="~{modules/index/deskstrip :: strip('a', ${cfg.couple.partner_a_name}, ${cfg.couple.partner_a_emoji}, ${cfg.couple.partner_a_avatar}, ${aCount}, ${aTok})}"
+  />
+  <th:block
+    th:replace="~{modules/index/deskstrip :: strip('b', ${cfg.couple.partner_b_name}, ${cfg.couple.partner_b_emoji}, ${cfg.couple.partner_b_avatar}, ${bCount}, ${bTok})}"
+  />
+</th:block>
+
+<th:block th:fragment="strip(side, name, emoji, avatar, count, tok)">
+  <aside
+    class="wqs-deskstrip"
+    th:classappend="|wqs-deskstrip--${side}|"
+    th:attr="data-wqs-desk=${side}"
+    hidden
+  >
+    <span
+      class="wqs-halo wqs-halo--solo wqs-deskstrip__stamp wqs-mono"
+      aria-hidden="true"
+      th:attr="data-wqs-mono=${side}"
+    >
+      <span class="wqs-halo__av">
+        <img th:if="${!#strings.isEmpty(avatar)}" th:src="${avatar}" alt="" />
+        <span class="wqs-mono__emoji" th:text="${emoji}" aria-hidden="true">🐰</span>
+        <span class="wqs-mono__ch" aria-hidden="true"></span>
+      </span>
+    </span>
+    <div class="wqs-deskstrip__body">
+      <p class="wqs-deskstrip__name" th:text="${name}">A</p>
+      <p class="wqs-deskstrip__hint">
+        <span th:text="${count == 0 ? #messages.msg('seat.hint') : #messages.msg('filter.empty')}">这一页还没有 TA 写的字。</span>
+        <span class="wqs-deskstrip__sum" th:if="${count > 0}">
+          <span th:text="${#messages.msg('footer.wrote')}">写了</span>
+          <b class="tabular" th:text="${count}">0</b>
+          <span th:text="${#messages.msg('stats.posts')}">封信</span>
+        </span>
+      </p>
+    </div>
+    <a
+      class="wqs-deskstrip__go"
+      th:if="${!#strings.isEmpty(tok)}"
+      th:href="@{|/authors/${tok}|}"
+      th:aria-label="${name + #messages.msg('author.deskSuffix')}"
+    >
+      <span th:text="${#messages.msg('footer.desk')}">去 TA 的信桌</span>
+      <span aria-hidden="true">→</span>
+    </a>
+  </aside>
+</th:block>

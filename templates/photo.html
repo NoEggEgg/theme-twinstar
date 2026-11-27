@@ -1,0 +1,157 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  xmlns:halo="https://halo.run/schema/thymeleaf"
+  th:replace="~{modules/layout :: html(content = ~{::content}, pageTitle = ${#strings.isEmpty(photo.spec.displayName) ? #messages.msg('photos.title') : photo.spec.displayName})}"
+>
+  
+
+  <th:block
+    th:fragment="content"
+    th:with="
+      exif = ${photo.exif},
+      photoName = ${!#strings.isEmpty(photo.spec.displayName) ? photo.spec.displayName : (!#strings.isEmpty(photo.spec.description) ? photo.spec.description : #messages.msg('photos.untitled'))},
+      camera = ${exif != null ? #strings.trim((exif.make ?: '') + ' ' + (exif.model ?: '')) : ''},
+      hasExif = ${exif != null and (!#strings.isEmpty(camera) or !#strings.isEmpty(exif.lensModel) or exif.fNumber != null or !#strings.isEmpty(exif.exposureTime) or exif.iso != null or exif.focalLength != null or exif.dateTimeOriginal != null)}
+    "
+  >
+    <section class="wqs-photos wqs-photo" th:aria-label="${#messages.msg('a11y.photos')}">
+      <th:block th:replace="~{modules/layout :: chead(label=${#messages.msg('photos.title')})}" />
+
+      <header class="wqs-photo__head">
+        <p class="wqs-photo__kicker">
+          <span th:text="${#messages.msg('photos.position', position, total)}">第 1 / 1 张</span>
+        </p>
+        <h1 class="wqs-photo__title" th:text="${photoName}">照片</h1>
+      </header>
+
+      <button
+        type="button"
+        class="wqs-photo__stage"
+        th:attr="data-wqs-photo=${photo.spec.url}, data-wqs-photo-name=${photo.spec.displayName}"
+        th:aria-label="${#messages.msg('photos.viewLarge')}"
+      >
+        <img
+          th:src="${photo.spec.url}"
+          th:alt="${photoName}"
+          fetchpriority="high"
+          decoding="async"
+          referrerpolicy="no-referrer"
+        />
+      </button>
+
+      <div
+        class="wqs-photo__meta"
+        th:if="${!#strings.isEmpty(photo.spec.description) or not #lists.isEmpty(photo.spec.tags) or hasExif}"
+      >
+        <p
+          class="wqs-photo__desc"
+          th:if="${!#strings.isEmpty(photo.spec.description)}"
+          th:text="${photo.spec.description}"
+        >照片描述</p>
+
+        <ul
+          class="wqs-photo__tags"
+          th:if="${not #lists.isEmpty(photo.spec.tags)}"
+          th:aria-label="${#messages.msg('photos.tags')}"
+        >
+          <li class="wqs-photo__tag" th:each="tag : ${photo.spec.tags}" th:text="${'#' + tag}">#标签</li>
+        </ul>
+
+        
+        <dl class="wqs-photo__exif" th:if="${hasExif}">
+          <div th:if="${!#strings.isEmpty(camera)}">
+            <dt th:text="${#messages.msg('photos.camera')}">相机</dt>
+            <dd th:text="${camera}">Sony A7</dd>
+          </div>
+          <div th:if="${!#strings.isEmpty(exif.lensModel)}">
+            <dt th:text="${#messages.msg('photos.lens')}">镜头</dt>
+            <dd th:text="${exif.lensModel}">35mm F1.8</dd>
+          </div>
+          <div th:if="${exif.fNumber != null}">
+            <dt th:text="${#messages.msg('photos.aperture')}">光圈</dt>
+            <dd th:text="${'f/' + #strings.replace(#numbers.formatDecimal(exif.fNumber, 1, 1), '.0', '')}">f/1.8</dd>
+          </div>
+          <div th:if="${!#strings.isEmpty(exif.exposureTime)}">
+            <dt th:text="${#messages.msg('photos.shutter')}">快门</dt>
+            <dd th:text="${exif.exposureTime + ' s'}">1/200 s</dd>
+          </div>
+          <div th:if="${exif.iso != null}">
+            <dt>ISO</dt>
+            <dd th:text="${exif.iso}">100</dd>
+          </div>
+          <div th:if="${exif.focalLength != null}">
+            <dt th:text="${#messages.msg('photos.focal')}">焦距</dt>
+            <dd th:text="${#strings.replace(#numbers.formatDecimal(exif.focalLength, 1, 1), '.0', '') + ' mm'}">50 mm</dd>
+          </div>
+          <div th:if="${exif.dateTimeOriginal != null}">
+            <dt th:text="${#messages.msg('photos.taken')}">拍摄</dt>
+            <dd th:text="${#temporals.format(exif.dateTimeOriginal, 'yyyy-MM-dd HH:mm')}">2026-11-25 10:00</dd>
+          </div>
+        </dl>
+      </div>
+
+      
+      <nav
+        class="wqs-photo__neighbors"
+        th:if="${not #lists.isEmpty(neighbors)}"
+        th:aria-label="${#messages.msg('a11y.photoNav')}"
+      >
+        <th:block th:each="neighbor : ${neighbors}">
+          <a
+            th:if="${neighbor.metadata.name != photo.metadata.name}"
+            class="wqs-photo__thumb"
+            th:href="@{${photoUrl.detail(neighbor)}}"
+          >
+            <img
+              th:src="${neighbor.spec.url}"
+              th:alt="${#strings.isEmpty(neighbor.spec.displayName) ? #messages.msg('photos.untitled') : neighbor.spec.displayName}"
+              loading="lazy"
+              referrerpolicy="no-referrer"
+            />
+          </a>
+          <span
+            th:if="${neighbor.metadata.name == photo.metadata.name}"
+            class="wqs-photo__thumb is-current"
+            aria-current="page"
+          >
+            <img th:src="${neighbor.spec.url}" alt="" referrerpolicy="no-referrer" />
+          </span>
+        </th:block>
+      </nav>
+
+      <nav class="wqs-photo__nav" th:aria-label="${#messages.msg('a11y.photoPager')}">
+        <a th:if="${prev != null}" class="wqs-photo__step" th:href="@{${photoUrl.detail(prev)}}">
+          <span aria-hidden="true">←</span>
+          <span th:text="${#messages.msg('photos.prev')}">上一张</span>
+        </a>
+        <span th:unless="${prev != null}" class="wqs-photo__step is-off" aria-hidden="true">←</span>
+
+        <a class="wqs-photo__back" th:href="@{${backUrl}}">
+          <span aria-hidden="true">⌂</span>
+          <span th:text="${#messages.msg('photos.back')}">回到相册</span>
+        </a>
+
+        <a th:if="${next != null}" class="wqs-photo__step" th:href="@{${photoUrl.detail(next)}}">
+          <span th:text="${#messages.msg('photos.next')}">下一张</span>
+          <span aria-hidden="true">→</span>
+        </a>
+        <span th:unless="${next != null}" class="wqs-photo__step is-off" aria-hidden="true">→</span>
+      </nav>
+
+      
+      <dialog class="wqs-lightbox" data-wqs-lightbox th:aria-label="${#messages.msg('photos.title')}">
+        
+        <img data-wqs-lightbox-img alt="" referrerpolicy="no-referrer" />
+        <p class="wqs-lightbox__name" data-wqs-lightbox-name></p>
+        <button
+          type="button"
+          class="wqs-lightbox__close"
+          data-wqs-lightbox-close
+          th:aria-label="${#messages.msg('photos.close')}"
+          th:title="${#messages.msg('photos.close')}"
+        >×</button>
+      </dialog>
+    </section>
+  </th:block>
+</html>

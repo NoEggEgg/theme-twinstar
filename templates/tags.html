@@ -1,0 +1,26 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(content = ~{::content}, pageTitle = ${#messages.msg('page.tags')})}"
+>
+  
+
+  <th:block th:fragment="content">
+  <th:block th:replace="~{modules/layout :: chead(label=${#messages.msg('page.tags')})}" />
+    <header class="wqs-pagehead"><h1 th:text="${#messages.msg('page.tags')}">标签</h1></header>
+
+    <ul class="t-taxlist">
+      <li th:each="tag : ${tags}">
+        
+        <span
+          class="t-taxlist__ink"
+          th:if="${tag.spec.color != null and #strings.startsWith(tag.spec.color, '#')}"
+          th:style="|--tag-ink:${tag.spec.color}|"
+          aria-hidden="true"
+        ></span>
+        <a th:href="@{${tag.status.permalink}}" th:text="${tag.spec.displayName}">标签名</a>
+        <span class="t-taxlist__count" th:text="${tag.postCount}">0</span>
+      </li>
+    </ul>
+  </th:block>
+</html>

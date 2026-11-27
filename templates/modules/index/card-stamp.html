@@ -1,0 +1,44 @@
+
+<a
+  th:fragment="card(post, cardStat, isA, hasCover, whoName, emoji, coverSizes, eagerName)"
+  class="wqs-stampcell"
+  th:attr="data-author=${isA ? 'a' : 'b'}"
+  th:href="@{${post.status.permalink}}"
+>
+  <span
+    class="wqs-stampcell__ph"
+    th:classappend="${hasCover ? '' : 'wqs-stampcell__ph--mono ' + (isA ? 'is-a' : 'is-b')}"
+  >
+    <th:block th:if="${hasCover}">
+      <th:block
+        th:replace="~{modules/cover-img :: img(${post.spec.cover}, ${post.spec.title}, 'wqs-stampcell', '', ${coverSizes}, ${eagerName == post.metadata.name})}"
+      />
+    </th:block>
+    <span class="wqs-stampcell__mono" th:unless="${hasCover}" aria-hidden="true">
+      <span class="wqs-stampcell__emoji" th:text="${emoji}">🐰</span>
+      <span class="wqs-stampcell__mono-name" th:text="${whoName}">作者</span>
+    </span>
+
+    <span class="wqs-stampcell__val wqs-letterday" th:if="${post.spec.publishTime != null}">
+      <b
+        class="tabular"
+        data-wqs-letterday
+        th:attr="data-wqs-pub=${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd')}"
+      >--</b>
+    </span>
+    <span
+      class="wqs-stampcell__no"
+      th:text="|No. ${#numbers.formatInteger(cardStat.count, 3)}|"
+    >No. 001</span>
+  </span>
+
+  <h2 class="wqs-stampcell__title" th:text="${post.spec.title}">文章标题</h2>
+  <span class="wqs-stampcell__meta">
+    <span class="wqs-stampcell__who" th:classappend="${isA ? 'is-a' : 'is-b'}" th:text="${whoName}">作者</span>
+    <time
+      class="wqs-stampcell__date tabular"
+      th:attr="datetime=${post.spec.publishTime}"
+      th:text="${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd')}"
+    >2026-01-01</time>
+  </span>
+</a>

@@ -1,0 +1,9 @@
+<!doctype html>
+
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:lang="${#locale.toLanguageTag}"
+  th:fragment="html (head, content)"
+  th:replace="~{modules/layout :: html(head = ${head}, content = ${content}, pageTitle = ${null})}"
+>
+</html>

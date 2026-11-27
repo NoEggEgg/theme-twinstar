@@ -1,0 +1,76 @@
+
+<article
+  th:fragment="card(post, cardStat, isA, hasCover, ownerName, whoName, avatarSrc, side, eagerName)"
+  class="wqs-pc"
+  th:classappend="${(hasCover ? '' : 'wqs-pc--plain') + ' wqs-pc--' + side}"
+  th:attr="data-author=${isA ? 'a' : 'b'}"
+>
+  <a
+    class="wqs-pc__photo"
+    th:if="${hasCover}"
+    th:href="@{${post.status.permalink}}"
+    tabindex="-1"
+    aria-hidden="true"
+  >
+    <th:block
+      th:replace="~{modules/cover-img :: img(${post.spec.cover}, ${post.spec.title}, 'wqs-pc', '', '(max-width: 860px) 92vw, 280px', ${eagerName == post.metadata.name})}"
+    />
+  </a>
+
+  <div class="wqs-pc__face">
+    <span
+      class="wqs-pc__ink"
+      th:if="${!hasCover}"
+      aria-hidden="true"
+      th:text="${isA ? cfg.couple.partner_a_emoji : cfg.couple.partner_b_emoji}"
+    >🐰</span>
+
+    <span class="wqs-pc__postmark" th:if="${post.spec.publishTime != null}" aria-hidden="true">
+      <span th:text="${#temporals.format(post.spec.publishTime, 'yyyy')}">2026</span>
+      <b th:text="${#temporals.format(post.spec.publishTime, 'MM.dd')}">11.24</b>
+    </span>
+
+    <span
+      class="wqs-pc__stamp"
+      th:classappend="${isA ? 'is-a' : 'is-b'}"
+      aria-hidden="true"
+    >
+      <span class="wqs-pc__stamp-face">
+        <img th:if="${!#strings.isEmpty(avatarSrc)}" th:src="${avatarSrc}" alt="" />
+        <span th:if="${#strings.isEmpty(avatarSrc)}" th:text="${isA ? cfg.couple.partner_a_emoji : cfg.couple.partner_b_emoji}">🐰</span>
+      </span>
+      <span class="wqs-pc__stamp-val wqs-letterday" th:if="${post.spec.publishTime != null}">
+        <b
+          data-wqs-letterday
+          th:attr="data-wqs-pub=${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd')}"
+        >--</b>
+        <span th:text="${#messages.msg('ms.daySuffix')}">天</span>
+      </span>
+    </span>
+
+    <h2 class="wqs-pc__title"><a th:href="@{${post.status.permalink}}" th:text="${post.spec.title}">文章标题</a></h2>
+    <p
+      class="wqs-pc__ex"
+      th:if="${cfg.home.show_excerpt and !#strings.isEmpty(post.status.excerpt)}"
+      th:text="${post.status.excerpt}"
+    >摘要</p>
+
+    <footer class="wqs-pc__meta">
+      <span
+        class="wqs-pc__who"
+        th:if="${post.owner != null}"
+        th:classappend="${isA ? 'is-a' : 'is-b'}"
+        th:text="${whoName}"
+      >作者</span>
+      <time
+        class="wqs-pc__date"
+        th:attr="datetime=${post.spec.publishTime}"
+        th:text="${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd')}"
+      >2026-01-01</time>
+      <span class="wqs-pc__go" aria-hidden="true">
+        <span th:text="${#messages.msg('card.read')}">读这封信</span>
+        <span>→</span>
+      </span>
+    </footer>
+  </div>
+</article>

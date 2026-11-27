@@ -1,0 +1,104 @@
+
+<th:block th:fragment="stream(posts, aMap, bMap, aTok, bTok, aCount, bCount, eagerName, rnd)">
+  <section
+    class="wqs-stream wqs-stream--spread"
+    th:attr="data-wqs-spread-mode=${cfg.home.spread_mode}"
+    th:aria-label="${#messages.msg('a11y.latestPosts')}"
+  >
+    
+    <th:block th:if="${cfg.home.spread_mode != 'by-author'}">
+      <th:block th:each="post, cardStat : ${posts.items}">
+        <th:block
+          th:replace="~{modules/index/card-spread :: card(${post}, ${cardStat}, ${aMap}, ${bMap}, null, ${eagerName})}"
+        />
+      </th:block>
+
+      <th:block th:if="${cfg.home.seat_enabled}">
+        <div class="wqs-spread__seat wqs-spread__seat--a" data-wqs-spread-seat="a" hidden>
+          <th:block
+            th:replace="~{modules/index/seat :: seat('a', ${cfg.couple.partner_a_name}, ${cfg.couple.partner_a_emoji}, ${cfg.couple.partner_a_avatar}, ${aCount}, ${aTok})}"
+          />
+        </div>
+        <div class="wqs-spread__seat wqs-spread__seat--b" data-wqs-spread-seat="b" hidden>
+          <th:block
+            th:replace="~{modules/index/seat :: seat('b', ${cfg.couple.partner_b_name}, ${cfg.couple.partner_b_emoji}, ${cfg.couple.partner_b_avatar}, ${bCount}, ${bTok})}"
+          />
+        </div>
+      </th:block>
+
+      <div class="wqs-fill wqs-fill--l" data-wqs-spread-fill="l" hidden>
+        <th:block
+          th:replace="~{modules/index/seat :: deskcard('a', ${cfg.couple.partner_a_name}, ${cfg.couple.partner_a_emoji}, ${cfg.couple.partner_a_avatar}, ${aCount}, ${aTok})}"
+        />
+        <div class="wqs-fill__blank" aria-hidden="true">
+          <span th:text="${#messages.msg('desk.blank')}">留给下一封</span>
+        </div>
+      </div>
+      <div class="wqs-fill wqs-fill--r" data-wqs-spread-fill="r" hidden>
+        <th:block
+          th:replace="~{modules/index/seat :: deskcard('b', ${cfg.couple.partner_b_name}, ${cfg.couple.partner_b_emoji}, ${cfg.couple.partner_b_avatar}, ${bCount}, ${bTok})}"
+        />
+        <div class="wqs-fill__blank" aria-hidden="true">
+          <span th:text="${#messages.msg('desk.blank')}">留给下一封</span>
+        </div>
+      </div>
+    </th:block>
+
+    
+    <th:block th:if="${cfg.home.spread_mode == 'by-author'}">
+      <div class="wqs-spread__page wqs-spread__page--b" data-wqs-spread-page="b">
+        <th:block th:each="post, cardStat : ${posts.items}">
+          <th:block
+            th:replace="~{modules/index/card-spread :: card(${post}, ${cardStat}, ${aMap}, ${bMap}, 'b', ${eagerName})}"
+          />
+        </th:block>
+        <th:block th:if="${cfg.home.seat_enabled}">
+          <div class="wqs-spread__seat wqs-spread__seat--b" data-wqs-spread-seat="b" hidden>
+            <th:block
+              th:replace="~{modules/index/seat :: seat('b', ${cfg.couple.partner_b_name}, ${cfg.couple.partner_b_emoji}, ${cfg.couple.partner_b_avatar}, ${bCount}, ${bTok})}"
+            />
+          </div>
+        </th:block>
+        <div class="wqs-fill wqs-fill--r" data-wqs-spread-fill="r" hidden>
+          <th:block
+            th:replace="~{modules/index/seat :: deskcard('b', ${cfg.couple.partner_b_name}, ${cfg.couple.partner_b_emoji}, ${cfg.couple.partner_b_avatar}, ${bCount}, ${bTok})}"
+          />
+          <div class="wqs-fill__blank" aria-hidden="true">
+            <span th:text="${#messages.msg('desk.blank')}">留给下一封</span>
+          </div>
+        </div>
+        
+        <p class="wqs-spread__note" aria-hidden="true" th:text="${#messages.msg('desk.blank')}">留给下一封</p>
+      </div>
+
+      <div class="wqs-spread__page wqs-spread__page--a" data-wqs-spread-page="a">
+        <th:block th:each="post, cardStat : ${posts.items}">
+          <th:block
+            th:replace="~{modules/index/card-spread :: card(${post}, ${cardStat}, ${aMap}, ${bMap}, 'a', ${eagerName})}"
+          />
+        </th:block>
+        <th:block th:if="${cfg.home.seat_enabled}">
+          <div class="wqs-spread__seat wqs-spread__seat--a" data-wqs-spread-seat="a" hidden>
+            <th:block
+              th:replace="~{modules/index/seat :: seat('a', ${cfg.couple.partner_a_name}, ${cfg.couple.partner_a_emoji}, ${cfg.couple.partner_a_avatar}, ${aCount}, ${aTok})}"
+            />
+          </div>
+        </th:block>
+        <div class="wqs-fill wqs-fill--l" data-wqs-spread-fill="l" hidden>
+          <th:block
+            th:replace="~{modules/index/seat :: deskcard('a', ${cfg.couple.partner_a_name}, ${cfg.couple.partner_a_emoji}, ${cfg.couple.partner_a_avatar}, ${aCount}, ${aTok})}"
+          />
+          <div class="wqs-fill__blank" aria-hidden="true">
+            <span th:text="${#messages.msg('desk.blank')}">留给下一封</span>
+          </div>
+        </div>
+        <p class="wqs-spread__note" aria-hidden="true" th:text="${#messages.msg('desk.blank')}">留给下一封</p>
+      </div>
+    </th:block>
+  </section>
+
+  
+  <th:block th:if="${cfg.home.show_knot}">
+    <th:block th:replace="~{modules/index/knot :: knot(${rnd}, ${posts})}" />
+  </th:block>
+</th:block>

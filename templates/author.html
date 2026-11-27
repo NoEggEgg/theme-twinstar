@@ -1,0 +1,105 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(content = ~{::content}, pageTitle = ${author.spec.displayName})}"
+>
+  
+
+  <th:block
+    th:fragment="content"
+    th:with="
+      aMap = ${',' + #strings.replace(cfg.couple.partner_a_author, ' ', '') + ','},
+      bMap = ${',' + #strings.replace(cfg.couple.partner_b_author, ' ', '') + ','},
+      isA = ${#strings.contains(aMap, ',' + author.metadata.name + ',') or #strings.contains(aMap, ',' + author.spec.displayName + ',') or author.spec.displayName == cfg.couple.partner_a_name or (!#strings.isEmpty(cfg.couple.partner_a_name) and (#strings.contains(#strings.trim(author.spec.displayName), #strings.trim(cfg.couple.partner_a_name)) or #strings.contains(#strings.trim(cfg.couple.partner_a_name), #strings.trim(author.spec.displayName))))},
+      isB = ${!isA and (#strings.contains(bMap, ',' + author.metadata.name + ',') or #strings.contains(bMap, ',' + author.spec.displayName + ',') or author.spec.displayName == cfg.couple.partner_b_name or (!#strings.isEmpty(cfg.couple.partner_b_name) and (#strings.contains(#strings.trim(author.spec.displayName), #strings.trim(cfg.couple.partner_b_name)) or #strings.contains(#strings.trim(cfg.couple.partner_b_name), #strings.trim(author.spec.displayName)))))},
+      avCfg = ${isA ? cfg.couple.partner_a_avatar : cfg.couple.partner_b_avatar},
+      av = ${#strings.isEmpty(avCfg) ? author.spec.avatar : avCfg},
+      deskName = ${isA ? cfg.couple.partner_a_name : (isB ? cfg.couple.partner_b_name : author.spec.displayName)}
+    "
+  >
+  <th:block th:replace="~{modules/layout :: chead(label=${#messages.msg('author.chead')})}" />
+    <header class="wqs-pagehead wqs-desk" th:classappend="${isA ? 'wqs-desk--a' : (isB ? 'wqs-desk--b' : '')}">
+      <span class="wqs-halo wqs-halo--solo" aria-hidden="true">
+        <span
+          class="wqs-halo__av wqs-mono"
+          th:classappend="${isA ? '' : (isB ? 'wqs-halo__av--b' : '')}"
+          th:attr="data-wqs-mono=${isA ? 'a' : (isB ? 'b' : 'x')}, data-wqs-mono-name=${isA or isB ? '' : author.spec.displayName}"
+        >
+          <img th:if="${!#strings.isEmpty(av)}" th:src="${av}" th:alt="${author.spec.displayName}" />
+          <span
+            class="wqs-mono__emoji"
+            th:text="${isA ? cfg.couple.partner_a_emoji : (isB ? cfg.couple.partner_b_emoji : '')}"
+            aria-hidden="true"
+          >🐰</span>
+          
+          <span class="wqs-mono__ch" aria-hidden="true"></span>
+        </span>
+      </span>
+      <h1 th:text="|${deskName} ${#messages.msg('author.deskSuffix')}|">TA 的信桌</h1>
+      <p>
+        <b class="tabular" th:text="${posts.total}">3</b>
+        <span th:text="${#messages.msg('stats.posts')}">封信</span>
+        <span aria-hidden="true"> · </span>
+        <span th:if="${isA or isB}" th:text="${#messages.msg('hero.since', cfg.days.anniversary_date)}">始于 2020-05-20</span>
+      </p>
+      
+      <p
+        class="wqs-desk__bio"
+        th:if="${author.spec.bio != null and !#strings.isEmpty(author.spec.bio)}"
+        th:text="${author.spec.bio}"
+      >作者简介</p>
+    </header>
+
+    
+    <div class="wqs-minipost">
+      <article
+        class="wqs-minipost__card"
+        th:classappend="${'wqs-minipost__card--' + (st.index % 2 == 0 ? 'l' : 'r') + (isA ? ' is-a' : '') + (isB ? ' is-b' : '')}"
+        th:with="coverSizes=${'(max-width: 860px) 92vw, 440px'}"
+        th:each="post, st : ${posts.items}"
+      >
+        <a
+          class="wqs-minipost__cover"
+          th:classappend="${!#strings.isEmpty(post.spec.cover) ? '' : 'wqs-minipost__cover--ph'}"
+          th:href="@{${post.status.permalink}}"
+        >
+          <th:block th:if="${!#strings.isEmpty(post.spec.cover)}">
+            <th:block
+              th:replace="~{modules/cover-img :: img(${post.spec.cover}, ${post.spec.title}, 'wqs-minipost', '', ${coverSizes}, ${st.index < 2})}"
+            />
+          </th:block>
+        </a>
+        <h2 class="wqs-minipost__title">
+          <a th:href="@{${post.status.permalink}}" th:text="${post.spec.title}">文章标题</a>
+        </h2>
+        <p class="wqs-minipost__ex" th:if="${cfg.home.show_excerpt and !#strings.isEmpty(post.status.excerpt)}" th:text="${post.status.excerpt}">摘要</p>
+        <p class="wqs-minipost__meta">
+          <span
+            class="wqs-halo wqs-halo--solo wqs-minipost__face wqs-mono"
+            aria-hidden="true"
+            th:attr="data-wqs-mono='x', data-wqs-mono-name=${author.spec.displayName}"
+          >
+            <span class="wqs-halo__av">
+              <img th:if="${!#strings.isEmpty(av)}" th:src="${av}" alt="" />
+              <span class="wqs-mono__emoji" th:if="${#strings.isEmpty(av)}" aria-hidden="true"></span>
+              <span class="wqs-mono__ch" aria-hidden="true"></span>
+            </span>
+          </span>
+          <span class="wqs-minipost__day wqs-letterday">
+            <span th:text="${#messages.msg('ms.dayPrefix')}">第</span>
+            <b class="tabular" data-wqs-letterday th:if="${post.spec.publishTime != null}" th:attr="data-wqs-pub=${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd')}">--</b>
+            <span th:text="${#messages.msg('ms.daySuffix')}">天</span>
+          </span>
+          <time
+            class="wqs-minipost__date tabular"
+            th:attr="datetime=${post.spec.publishTime}"
+            th:text="${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd')}"
+          >2026-01-01</time>
+        </p>
+      </article>
+    </div>
+
+    <p class="t-empty" role="status" th:if="${#lists.isEmpty(posts.items)}" th:text="${#messages.msg('common.noPosts')}">第一封信还在路上。</p>
+    <th:block th:replace="~{modules/pager :: pager(base=${'/authors/' + author.metadata.name}, pageNo=${posts.page}, totalNo=${posts.totalPages})}" />
+  </th:block>
+</html>

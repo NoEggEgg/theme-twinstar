@@ -1,0 +1,88 @@
+
+<th:block
+  th:fragment="card(m, toneCls, toneEmoji)"
+  th:with="
+    c = ${m.spec.content},
+    owner = ${m.owner != null ? m.owner : null},
+    isA = ${toneCls == 'is-a'},
+    isB = ${toneCls == 'is-b'},
+    ownerName = ${owner != null and !#strings.isEmpty(owner.displayName) ? owner.displayName : #messages.msg('wall.anon')},
+    cfgName = ${isA ? cfg.couple.partner_a_name : (isB ? cfg.couple.partner_b_name : '')},
+    whoName = ${#strings.isEmpty(cfgName) ? ownerName : cfgName},
+    cfgAv = ${isA ? cfg.couple.partner_a_avatar : (isB ? cfg.couple.partner_b_avatar : '')},
+    avatarSrc = ${!#strings.isEmpty(cfgAv) ? cfgAv : (owner != null ? owner.avatar : '')},
+    photoCount = ${#lists.isEmpty(c.medium) ? 0 : #lists.size(c.medium.?[type.name == 'PHOTO'])},
+    ch = ${c.html == null ? '' : #strings.replace(#strings.replace(#strings.replace(#strings.replace(#strings.replace(c.html, '\u0026amp;ldquo;', '“'), '\u0026amp;rdquo;', '”'), '\u0026amp;mdash;', '—'), '\u0026amp;hellip;', '…'), '\u0026amp;amp;', '\u0026amp;')}
+  "
+>
+  <article class="wqs-moment" th:classappend="${toneCls}">
+    <div class="wqs-moment__side" aria-hidden="true">
+      <span class="wqs-moment__avatar">
+        <img th:if="${!#strings.isEmpty(avatarSrc)}" th:src="${avatarSrc}" th:alt="${whoName}" loading="lazy" />
+        <span th:if="${#strings.isEmpty(avatarSrc)}" th:text="${toneEmoji}">✦</span>
+      </span>
+      <i class="wqs-moment__rail"></i>
+    </div>
+    <div class="wqs-moment__body">
+      <header class="wqs-moment__meta">
+        <b class="wqs-moment__who" th:text="${whoName}">小乖乖</b>
+        
+        <a class="wqs-moment__time" th:href="@{'/moments/' + ${m.metadata.name}}">
+          <time
+            class="tabular"
+            th:text="${#temporals.format(m.spec.releaseTime, 'yyyy-MM-dd HH:mm')}"
+            th:attr="datetime=${#temporals.formatISO(m.spec.releaseTime)}"
+          >2026-11-05 21:30</time>
+        </a>
+      </header>
+      <div class="wqs-moment__text" th:if="${!#strings.isEmpty(c.html)}" th:utext="${ch}"></div>
+      
+      <div
+        class="wqs-moment__media"
+        th:if="${!#lists.isEmpty(c.medium)}"
+        data-wqs-gallery
+        th:attr="data-wqs-media-count=${photoCount}"
+      >
+        <th:block th:each="mi : ${c.medium}">
+          <a
+            class="wqs-moment__photo"
+            th:if="${mi.type.name == 'PHOTO'}"
+            th:href="${mi.url}"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-wqs-gallery-item
+            th:attr="data-wqs-full=${mi.url}, data-wqs-caption=${whoName}"
+          >
+            <img th:src="${mi.url}" th:alt="${whoName}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
+            <span class="wqs-moment__zoom" aria-hidden="true">⤢</span>
+          </a>
+          <video class="wqs-moment__video" th:if="${mi.type.name == 'VIDEO'}" th:src="${mi.url}" controls preload="metadata"></video>
+          <audio class="wqs-moment__audio" th:if="${mi.type.name == 'AUDIO'}" th:src="${mi.url}" controls preload="metadata"></audio>
+          
+          <a
+            class="wqs-moment__postref"
+            th:if="${mi.type.name == 'POST' and (c.html == null or !#strings.contains(c.html, 'hyperlink-card'))}"
+            th:href="${mi.url}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span aria-hidden="true">🔗</span>
+            <span class="wqs-moment__posturl" th:text="${mi.url}">链接</span>
+          </a>
+        </th:block>
+      </div>
+      
+      <footer
+        class="wqs-moment__tags"
+        th:if="${!#lists.isEmpty(m.spec.tags) and (c.html == null or !#strings.contains(c.html, 'moments?tag='))}"
+      >
+        <a
+          class="wqs-moment__chip"
+          th:each="t : ${m.spec.tags}"
+          th:href="@{/moments(tag=${t})}"
+          th:text="${'#' + t}"
+        >#标签</a>
+      </footer>
+    </div>
+  </article>
+</th:block>

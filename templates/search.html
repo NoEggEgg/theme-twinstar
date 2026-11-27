@@ -1,0 +1,55 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(content = ~{::content}, pageTitle = ${#messages.msg('search.title')})}"
+>
+  
+
+  <th:block th:fragment="content">
+    <section
+      class="wqs-search"
+      data-wqs-searchpage
+      th:attr="
+        data-wqs-search-loading=${#messages.msg('search.loading')},
+        data-wqs-search-count=${#messages.msg('search.count')},
+        data-wqs-search-untitled=${#messages.msg('search.untitled')},
+        data-wqs-search-type-post=${#messages.msg('search.typePost')},
+        data-wqs-search-type-moment=${#messages.msg('search.typeMoment')},
+        data-wqs-search-type-page=${#messages.msg('search.typePage')},
+        data-wqs-search-type-other=${#messages.msg('search.typeOther')}
+      "
+    >
+      <th:block th:replace="~{modules/layout :: chead(label=|${#messages.msg('search.title')}|)}" />
+
+      <header class="wqs-pagehead">
+        <h1 class="wqs-pagehead__title" th:text="${#messages.msg('search.title')}">搜索</h1>
+        <p class="wqs-pagehead__sub" th:text="${#messages.msg('search.hint')}">搜索文章、瞬间与页面</p>
+      </header>
+
+      <form class="wqs-search__form" method="get" th:action="@{/search}" role="search">
+        <label class="wqs-search__label" for="wqs-search-input" th:text="${#messages.msg('search.label')}">搜索关键词</label>
+        <input
+          id="wqs-search-input"
+          class="wqs-search__input"
+          type="search"
+          name="keyword"
+          value=""
+          data-wqs-search-input
+          th:placeholder="${#messages.msg('search.placeholder')}"
+          autocomplete="off"
+        />
+        <button class="wqs-search__go" type="submit" th:text="${#messages.msg('search.submit')}">搜索</button>
+      </form>
+
+      <p class="wqs-search__meta" data-wqs-search-meta role="status" hidden></p>
+      <p class="wqs-search__idle" data-wqs-search-idle th:text="${#messages.msg('search.idle')}">输入关键词，开始检索。</p>
+      <ol class="wqs-search__list" data-wqs-search-list></ol>
+      <p class="wqs-search__empty" data-wqs-search-empty hidden th:text="${#messages.msg('search.empty')}">
+        没有找到相关内容，换个关键词试试。
+      </p>
+      <p class="wqs-search__empty" data-wqs-search-fail hidden th:text="${#messages.msg('search.fail')}">
+        搜索暂时不可用，请稍后重试。
+      </p>
+    </section>
+  </th:block>
+</html>

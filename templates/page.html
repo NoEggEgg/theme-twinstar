@@ -1,0 +1,27 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  xmlns:halo="https://halo.run/schema/thymeleaf"
+  th:replace="~{modules/layout :: html(content = ~{::content}, pageTitle = ${singlePage.spec.title})}"
+>
+  
+
+  <th:block th:fragment="content">
+    <article class="t-post">
+      
+      <div class="wqs-paper">
+        <header class="t-post__header">
+          <h1 class="t-post__title" th:text="${singlePage.spec.title}">页面标题</h1>
+        </header>
+        <div class="t-post__content" th:utext="${singlePage.content.content}">正文</div>
+      </div>
+    </article>
+
+    
+    <div class="t-comments" th:if="${haloCommentEnabled}">
+      <halo:comment
+        th:attr="group=${'content.halo.run'}, kind=${'SinglePage'}, name=${singlePage.metadata.name}"
+      />
+    </div>
+  </th:block>
+</html>

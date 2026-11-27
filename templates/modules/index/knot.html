@@ -1,0 +1,25 @@
+
+<th:block th:fragment="knot(rnd, posts)">
+  <th:block th:if="${rnd != null and !#lists.isEmpty(rnd) and !#lists.isEmpty(posts.items)}">
+    <div class="wqs-knot">
+      <a class="wqs-knot__tag" th:href="@{${rnd[0].status.permalink}}">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1M7.7 16.3l-2.1 2.1" />
+          <circle cx="12" cy="12" r="2.5" />
+        </svg>
+        <span class="wqs-knot__label" th:text="${#messages.msg('random.label')}">随机打开一封旧信</span>
+        <b class="wqs-knot__title" th:text="${rnd[0].spec.title}">旧信标题</b>
+        <span class="wqs-knot__day" th:if="${rnd[0].spec.publishTime != null}">
+          <span th:text="${#messages.msg('ms.dayPrefix')}">第</span>
+          <b
+            class="tabular"
+            data-wqs-letterday
+            th:attr="data-wqs-pub=${#temporals.format(rnd[0].spec.publishTime, 'yyyy-MM-dd')}"
+          >--</b>
+          <span th:text="${#messages.msg('ms.daySuffix')}">天</span>
+        </span>
+        <span class="wqs-knot__go" aria-hidden="true">→</span>
+      </a>
+    </div>
+  </th:block>
+</th:block>

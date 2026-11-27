@@ -1,0 +1,74 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  xmlns:halo="https://halo.run/schema/thymeleaf"
+  th:replace="~{modules/layout :: html(content = ~{::content}, pageTitle = ${#strings.isEmpty(title) ? #messages.msg('photos.title') : title})}"
+>
+  
+
+  <th:block th:fragment="content" th:with="photoT = ${title}, curGroup = ${group}">
+    <section class="wqs-photos" th:aria-label="${#messages.msg('a11y.photos')}">
+  <th:block th:replace="~{modules/layout :: chead(label=${#messages.msg('photos.title')})}" />
+      <header class="wqs-pagehead">
+        <h1 class="wqs-pagehead__title" th:text="${#strings.isEmpty(photoT) ? #messages.msg('photos.title') : photoT}">相册</h1>
+        <p class="wqs-pagehead__sub" th:text="${#messages.msg('photos.sub')}">你们拍下的光。</p>
+      </header>
+
+      
+      <nav class="wqs-tabs" th:if="${!#lists.isEmpty(groups)}" th:aria-label="${#messages.msg('a11y.photoGroups')}">
+        <a
+          class="wqs-tabs__tab"
+          th:href="@{/photos}"
+          th:classappend="${curGroup == null ? 'is-active' : ''}"
+          th:text="${#messages.msg('filter.all')}"
+        >全部</a>
+        <a
+          class="wqs-tabs__tab"
+          th:each="item : ${groups}"
+          th:href="@{${photoUrl.list(item.metadata.name)}}"
+          th:classappend="${curGroup != null and curGroup == item.metadata.name ? 'is-active' : ''}"
+        >
+          <span th:text="${#strings.isEmpty(item.spec.displayName) ? item.metadata.name : item.spec.displayName}">分组</span>
+          <span class="wqs-tabs__num tabular" th:text="${item.status.photoCount}">0</span>
+        </a>
+      </nav>
+
+      <ul class="wqs-photos__grid">
+        <li class="wqs-photos__item" th:each="ph : ${photos.items}">
+          <button
+            type="button"
+            class="wqs-photos__card"
+            th:attr="data-wqs-photo=${ph.spec.url}, data-wqs-photo-name=${ph.spec.displayName}"
+          >
+            <img th:src="${ph.spec.url}" th:alt="${ph.spec.displayName}" loading="lazy" referrerpolicy="no-referrer" />
+          </button>
+          
+          <a
+            class="wqs-photos__cap"
+            th:href="@{${photoUrl.detail(ph)}}"
+            th:text="${!#strings.isEmpty(ph.spec.displayName) ? ph.spec.displayName : (!#strings.isEmpty(ph.spec.description) ? ph.spec.description : #messages.msg('photos.untitled'))}"
+          >照片名</a>
+        </li>
+      </ul>
+
+      
+      <p class="wqs-empty" role="status" th:if="${#lists.isEmpty(photos.items)}">
+        <span aria-hidden="true">📷</span>
+        <span th:text="${#messages.msg('photos.empty')}">相册还空着 —— 等一张好照片。</span>
+      </p>
+
+      <nav class="t-pagination" th:if="${photos.hasPrevious() or photos.hasNext()}" th:aria-label="${#messages.msg('a11y.pagination')}">
+        <a class="t-pagination__prev" th:if="${photos.hasPrevious()}" th:href="${photos.prevUrl}" th:text="${#messages.msg('common.previousPage')}">上一页</a>
+        <a class="t-pagination__next" th:if="${photos.hasNext()}" th:href="${photos.nextUrl}" th:text="${#messages.msg('common.nextPage')}">下一页</a>
+      </nav>
+
+      
+      <dialog class="wqs-lightbox" data-wqs-lightbox th:aria-label="${#messages.msg('photos.title')}">
+        
+        <img data-wqs-lightbox-img alt="" referrerpolicy="no-referrer" />
+        <p class="wqs-lightbox__name" data-wqs-lightbox-name></p>
+        <button type="button" class="wqs-lightbox__close" data-wqs-lightbox-close th:aria-label="${#messages.msg('photos.close')}" th:title="${#messages.msg('photos.close')}">×</button>
+      </dialog>
+    </section>
+  </th:block>
+</html>

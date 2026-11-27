@@ -1,0 +1,109 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(content = ~{::content})}"
+>
+  
+
+  
+  <th:block
+    th:fragment="content"
+    th:with="
+      allPosts = ${cfg.home.show_otd ? postFinder.listAll() : {}},
+      rnd = ${cfg.home.show_knot ? postFinder.random(1) : null},
+      todayMD = ${#temporals.format(#temporals.createNow(), 'MM-dd')},
+      thisYear = ${#temporals.format(#temporals.createNow(), 'yyyy')},
+      aMap = ${',' + #strings.replace(cfg.couple.partner_a_author, ' ', '') + ','},
+      layout = ${#strings.contains('dual|spread|postcard|stamps', cfg.home.list_layout) ? cfg.home.list_layout : 'dual'},
+      bMap = ${',' + #strings.replace(cfg.couple.partner_b_author, ' ', '') + ','},
+      aToks = ${#strings.listSplit(cfg.couple.partner_a_author, ',')},
+      aTok = ${#lists.isEmpty(aToks) ? '' : #strings.trim(aToks[0])},
+      bToks = ${#strings.listSplit(cfg.couple.partner_b_author, ',')},
+      bTok = ${#lists.isEmpty(bToks) ? '' : #strings.trim(bToks[0])},
+      userA = ${#strings.isEmpty(aTok) ? null : contributorFinder.getContributor(aTok)},
+      userB = ${#strings.isEmpty(bTok) ? null : contributorFinder.getContributor(bTok)},
+      faceA = ${!#strings.isEmpty(cfg.couple.partner_a_avatar) ? cfg.couple.partner_a_avatar : (userA != null ? userA.avatar : '')},
+      faceB = ${!#strings.isEmpty(cfg.couple.partner_b_avatar) ? cfg.couple.partner_b_avatar : (userB != null ? userB.avatar : '')},
+      aStat = ${#strings.isEmpty(aTok) ? null : postFinder.listByOwner(1, 1, aTok)},
+      aCount = ${aStat == null ? -1 : aStat.total},
+      bStat = ${#strings.isEmpty(bTok) ? null : postFinder.listByOwner(1, 1, bTok)},
+      bCount = ${bStat == null ? -1 : bStat.total},
+      photoCount = ${pluginFinder.available('PluginPhotos') ? photoFinder.list(1, 1).total : 0},
+      momentCount = ${pluginFinder.available('PluginMoments') ? momentFinder.list(1, 1).total : 0},
+      hasPosts = ${!#lists.isEmpty(posts.items)},
+      outOfRange = ${posts.totalPages > 0 and posts.page > posts.totalPages},
+      coverPosts = ${#lists.isEmpty(posts.items) ? null : posts.items.?[!#strings.isEmpty(spec.cover)]},
+      eagerName = ${coverPosts == null or #lists.isEmpty(coverPosts) ? '' : coverPosts[0].metadata.name}
+    "
+  >
+    
+    <th:block
+      th:replace="~{modules/index/mast :: mast(${aTok}, ${bTok}, ${faceA}, ${faceB}, ${aCount}, ${bCount}, ${photoCount}, ${momentCount})}"
+    />
+
+    
+    <th:block th:if="${cfg.home.show_channels}">
+      <th:block th:replace="~{modules/index/channels :: channels(${#lists.size(posts.items)})}" />
+    </th:block>
+
+    
+    <th:block th:if="${layout == 'dual' and hasPosts}">
+      <th:block
+        th:replace="~{modules/index/stream-dual :: stream(${posts}, ${aMap}, ${bMap}, ${aTok}, ${bTok}, ${aCount}, ${bCount}, ${rnd}, ${eagerName})}"
+      />
+    </th:block>
+
+    
+    <th:block th:if="${layout == 'spread' and hasPosts}">
+      <th:block
+        th:replace="~{modules/index/stream-spread :: stream(${posts}, ${aMap}, ${bMap}, ${aTok}, ${bTok}, ${aCount}, ${bCount}, ${eagerName}, ${rnd})}"
+      />
+    </th:block>
+
+    
+    <th:block th:if="${layout == 'postcard' and hasPosts}">
+      <th:block th:replace="~{modules/index/stream-postcard :: stream(${posts}, ${aMap}, ${bMap}, ${eagerName}, ${rnd})}" />
+    </th:block>
+
+    
+    <th:block th:if="${layout == 'stamps' and hasPosts}">
+      <th:block th:replace="~{modules/index/stream-stamps :: stream(${posts}, ${aMap}, ${bMap}, ${aTok}, ${bTok}, ${eagerName}, ${rnd})}" />
+    </th:block>
+
+    
+    <div class="wqs-empty wqs-empty--missing" role="status" th:if="${outOfRange}">
+      <span aria-hidden="true">✦</span>
+      <p class="wqs-empty__title" th:text="${#messages.msg('common.pageMissing', posts.page)}">第 999 页不存在</p>
+      <p th:text="${#messages.msg('common.pageMissingBody')}">这一页没有信。</p>
+      <p class="wqs-empty__total" th:text="${#messages.msg('common.totalPages', posts.totalPages)}">共 15 页</p>
+      <div class="wqs-empty__links">
+        <a class="wqs-empty__link" th:href="@{/}" th:text="${#messages.msg('common.goFirst')}">回到第 1 页</a>
+        <a
+          class="wqs-empty__link"
+          th:href="${posts.totalPages > 1 ? '/page/' + posts.totalPages + '/' : '/'}"
+          th:text="${#messages.msg('common.goLast')}"
+        >回到最后一页</a>
+      </div>
+    </div>
+
+    <div class="wqs-empty" role="status" th:if="${!hasPosts and !outOfRange}">
+      <span aria-hidden="true">✦</span>
+      <span th:text="${#messages.msg('common.noPosts')}">第一封信还在路上。</span>
+    </div>
+
+    
+    <th:block th:if="${(layout == 'postcard' or layout == 'stamps') and cfg.home.seat_enabled and hasPosts}">
+      <th:block th:replace="~{modules/index/deskstrip :: strips(${aTok}, ${bTok}, ${aCount}, ${bCount})}" />
+    </th:block>
+
+    
+    <th:block th:if="${!outOfRange}">
+      <th:block th:replace="~{modules/pager :: pager(base='', pageNo=${posts.page}, totalNo=${posts.totalPages})}" />
+    </th:block>
+
+    
+    <th:block th:if="${!outOfRange and cfg.home.show_otd}">
+      <th:block th:replace="~{modules/index/otd :: otd(${allPosts}, ${todayMD}, ${thisYear})}" />
+    </th:block>
+  </th:block>
+</html>

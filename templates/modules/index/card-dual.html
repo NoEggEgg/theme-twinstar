@@ -1,0 +1,136 @@
+
+
+<th:block th:fragment="row(post, cardStat, side, aMap, bMap, eagerName)">
+  <th:block
+    th:with="
+      isA = ${post.owner != null and (#strings.contains(aMap, ',' + post.owner.metadata.name + ',') or #strings.contains(aMap, ',' + post.owner.displayName + ',') or post.owner.displayName == cfg.couple.partner_a_name or (!#strings.isEmpty(cfg.couple.partner_a_name) and (#strings.contains(#strings.trim(post.owner.displayName), #strings.trim(cfg.couple.partner_a_name)) or #strings.contains(#strings.trim(cfg.couple.partner_a_name), #strings.trim(post.owner.displayName)))))},
+      isB = ${post.owner != null and !isA and (#strings.contains(bMap, ',' + post.owner.metadata.name + ',') or #strings.contains(bMap, ',' + post.owner.displayName + ',') or post.owner.displayName == cfg.couple.partner_b_name or (!#strings.isEmpty(cfg.couple.partner_b_name) and (#strings.contains(#strings.trim(post.owner.displayName), #strings.trim(cfg.couple.partner_b_name)) or #strings.contains(#strings.trim(cfg.couple.partner_b_name), #strings.trim(post.owner.displayName)))))},
+      ownerName = ${post.owner != null ? post.owner.displayName : ''},
+      whoName = ${isA ? cfg.couple.partner_a_name : (isB ? cfg.couple.partner_b_name : ownerName)},
+      hasCover = ${!#strings.isEmpty(post.spec.cover)},
+      coverSizes = ${cardStat.first and cfg.home.show_feature ? '(max-width: 860px) 92vw, 460px' : '(max-width: 860px) 92vw, 440px'},
+      cfgAv = ${isA ? cfg.couple.partner_a_avatar : cfg.couple.partner_b_avatar},
+      ownerAv = ${post.owner != null ? post.owner.avatar : ''},
+      avatarSrc = ${#strings.isEmpty(cfgAv) ? ownerAv : cfgAv}
+    "
+  >
+    <div
+      class="wqs-row"
+      th:if="${side == 'full' or (side == 'a' ? isA : isB)}"
+      th:classappend="${side == 'full' ? 'wqs-row--full' : (isA ? 'wqs-row--l' : 'wqs-row--r')}"
+      th:style="|order:${cardStat.index}|"
+    >
+      <th:block
+        th:replace="~{modules/index/card-dual :: card(${post}, ${cardStat}, ${isA}, ${hasCover}, ${coverSizes}, ${ownerName}, ${whoName}, ${avatarSrc}, ${eagerName})}"
+      />
+    </div>
+  </th:block>
+</th:block>
+<article
+  th:fragment="card(post, cardStat, isA, hasCover, coverSizes, ownerName, whoName, avatarSrc, eagerName)"
+  class="wqs-card wqs-raisecard"
+  th:classappend="${(cardStat.first and cfg.home.show_feature ? 'wqs-card--feature' : '') + (!hasCover ? ' wqs-card--text' : '')}"
+  th:attr="data-author=${isA ? 'a' : 'b'}"
+  th:with="cat=${post.categories != null and !#lists.isEmpty(post.categories)
+      ? post.categories[0].spec.displayName
+      : (post.tags != null and !#lists.isEmpty(post.tags) ? post.tags[0].spec.displayName : '')}"
+>
+  <div class="wqs-card__body">
+    
+    <div class="wqs-card__head">
+      <span class="wqs-card__by">
+        <span
+          class="wqs-halo wqs-halo--solo wqs-halo--mini wqs-mono"
+          aria-hidden="true"
+          th:attr="data-wqs-mono=${isA ? 'a' : 'b'}, data-wqs-mono-name=${ownerName}"
+        >
+          <span class="wqs-halo__av" th:classappend="${isA ? '' : 'wqs-halo__av--b'}">
+            <img th:if="${!#strings.isEmpty(avatarSrc)}" th:src="${avatarSrc}" alt="" />
+            <span
+              class="wqs-mono__emoji"
+              th:text="${isA ? cfg.couple.partner_a_emoji : cfg.couple.partner_b_emoji}"
+              aria-hidden="true"
+            >🐰</span>
+            <span class="wqs-mono__ch" aria-hidden="true"></span>
+          </span>
+        </span>
+        <span
+          class="wqs-card__who"
+          th:if="${post.owner != null}"
+          th:classappend="${isA ? 'is-a' : 'is-b'}"
+          th:text="${whoName}"
+        >作者</span>
+        <span class="wqs-card__who" th:if="${post.owner == null}" aria-hidden="true"></span>
+      </span>
+      <time
+        class="wqs-card__date"
+        th:attr="datetime=${post.spec.publishTime}"
+        th:text="${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd')}"
+      >2026-01-01</time>
+    </div>
+
+    
+    <p class="wqs-card__kicker" th:if="${!#strings.isEmpty(cat) or (cardStat.first and cfg.home.show_feature)}">
+      <span
+        class="wqs-card__feature"
+        th:if="${cardStat.first and cfg.home.show_feature}"
+        th:text="${#messages.msg('card.feature')}"
+      >头版</span>
+      <span th:if="${!#strings.isEmpty(cat)}" th:text="${cat}">分类</span>
+      <span
+        class="wqs-card__pinned"
+        th:if="${cardStat.first and cfg.home.show_feature and post.spec.pinned}"
+        th:text="${#messages.msg('card.pinned')}"
+      >置顶</span>
+    </p>
+
+    <h2 class="wqs-card__title">
+      <a th:href="@{${post.status.permalink}}" th:text="${post.spec.title}">文章标题</a>
+    </h2>
+    <p
+      class="wqs-card__excerpt"
+      th:if="${cfg.home.show_excerpt and !#strings.isEmpty(post.status.excerpt)}"
+      th:text="${post.status.excerpt}"
+    >
+      摘要
+    </p>
+
+    <div class="wqs-card__meta">
+      <span class="wqs-card__ago wqs-letterday" th:if="${post.spec.publishTime != null}">
+        <span th:text="${#messages.msg('ms.dayPrefix')}">第</span>
+        <b
+          class="tabular"
+          data-wqs-letterday
+          th:attr="data-wqs-pub=${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd')}"
+        >--</b>
+        <span th:text="${#messages.msg('ms.daySuffix')}">天</span>
+      </span>
+      <span class="wqs-card__go" aria-hidden="true">
+        <span th:text="${#messages.msg('card.read')}">读这封信</span>
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14m0 0-6-6m6 6-6 6" />
+        </svg>
+      </span>
+    </div>
+  </div>
+
+  
+  <a class="wqs-card__cover" th:if="${hasCover}" th:href="@{${post.status.permalink}}">
+    <th:block
+      th:replace="~{modules/cover-img :: img(${post.spec.cover}, ${post.spec.title}, 'wqs-card', '', ${coverSizes}, ${eagerName == post.metadata.name})}"
+    />
+  </a>
+
+  
+  <div class="wqs-card__seal" th:if="${cardStat.first and cfg.home.show_feature and !hasCover}" aria-hidden="true">
+    <span class="wqs-card__seal-wax">♥</span>
+    <span class="wqs-card__seal-day">
+      <b
+        class="tabular"
+        data-wqs-letterday
+        th:attr="data-wqs-pub=${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd')}"
+      >--</b>
+    </span>
+    <span class="wqs-card__seal-unit" th:text="${#messages.msg('ms.daySuffix')}">天</span>
+  </div>
+</article>

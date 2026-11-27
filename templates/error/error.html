@@ -1,0 +1,52 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(content = ~{::content}, pageTitle = ${#messages.msg('page.error.title')})}"
+>
+  
+
+  <th:block th:fragment="content">
+  <th:block th:replace="~{modules/layout :: chead(label=|${error != null and error.status == 404 ? #messages.msg('error404.eggTitle') : #messages.msg('page.error.titleGeneric')}|)}" />
+
+    <section class="t-error" th:classappend="${error != null and error.status == 404 ? 't-error--lost' : ''}">
+      <p class="t-error__code" th:text="${error != null ? error.status : '·'}">404</p>
+      <h1
+        class="t-error__title"
+        th:text="${error != null and error.status == 404 ? #messages.msg('page.error.title404') : #messages.msg('page.error.titleGeneric')}"
+      >
+        页面不存在
+      </h1>
+      <p
+        class="t-error__hint"
+        th:text="${error != null and error.status == 404
+          ? #messages.msg('page.error.hint404')
+          : #messages.msg('page.error.hintGeneric')}"
+      >
+        你访问的页面不存在。
+      </p>
+      <p class="t-error__actions">
+        
+        <a class="t-error__back" th:href="@{/}" th:text="${#messages.msg('common.backHome')}">返回首页</a>
+        <a class="t-error__back" th:href="@{/archives}" th:text="${#messages.msg('common.archives')}">查看归档</a>
+      </p>
+      
+      <th:block th:if="${error != null and error.status == 404}">
+        <div class="t-error__egg" data-wqs-egg>
+          <p class="t-error__eggtitle" th:text="${#messages.msg('error404.eggTitle')}">我们走散了</p>
+          <div class="t-error__eggrow">
+            <input
+              class="t-error__egginput"
+              type="text"
+              autocomplete="off"
+              data-wqs-egg-input
+              th:attr="placeholder=${#messages.msg('error404.eggPlaceholder')}"
+              th:aria-label="${#messages.msg('error404.eggPlaceholder')}"
+            />
+            <button class="t-error__eggbtn" type="button" data-wqs-egg-go th:text="${#messages.msg('error404.eggGo')}">带我回家</button>
+          </div>
+          <p class="t-error__egghint" th:text="${#messages.msg('error404.eggHint')}">输入 TA 的名字，就能找到回家的路。</p>
+        </div>
+      </th:block>
+    </section>
+  </th:block>
+</html>

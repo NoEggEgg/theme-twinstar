@@ -1,0 +1,62 @@
+
+<th:block th:fragment="stream(posts, aMap, bMap, aTok, bTok, eagerName, rnd)">
+  <section class="wqs-stream wqs-stream--stamps" th:aria-label="${#messages.msg('a11y.latestPosts')}">
+    <div class="wqs-sheet">
+      <div class="wqs-sheet__head">
+        <span
+          class="wqs-sheet__label"
+          th:text="${#messages.msgWithParams('stamps.sheet', #lists.size(posts.items))}"
+        >整版 · 10 枚</span>
+        <span class="wqs-sheet__seal" aria-hidden="true">♥</span>
+      </div>
+      <div class="wqs-sheetgrid">
+        <th:block th:each="post, cardStat : ${posts.items}">
+          <th:block
+            th:with="
+              isA = ${post.owner != null and (#strings.contains(aMap, ',' + post.owner.metadata.name + ',') or #strings.contains(aMap, ',' + post.owner.displayName + ',') or post.owner.displayName == cfg.couple.partner_a_name or (!#strings.isEmpty(cfg.couple.partner_a_name) and (#strings.contains(#strings.trim(post.owner.displayName), #strings.trim(cfg.couple.partner_a_name)) or #strings.contains(#strings.trim(cfg.couple.partner_a_name), #strings.trim(post.owner.displayName)))))},
+              isB = ${post.owner != null and !isA and (#strings.contains(bMap, ',' + post.owner.metadata.name + ',') or #strings.contains(bMap, ',' + post.owner.displayName + ',') or post.owner.displayName == cfg.couple.partner_b_name or (!#strings.isEmpty(cfg.couple.partner_b_name) and (#strings.contains(#strings.trim(post.owner.displayName), #strings.trim(cfg.couple.partner_b_name)) or #strings.contains(#strings.trim(cfg.couple.partner_b_name), #strings.trim(post.owner.displayName)))))},
+              ownerName = ${post.owner != null ? post.owner.displayName : ''},
+              whoName = ${isA ? cfg.couple.partner_a_name : (isB ? cfg.couple.partner_b_name : ownerName)},
+              emoji = ${isA ? cfg.couple.partner_a_emoji : cfg.couple.partner_b_emoji},
+              hasCover = ${!#strings.isEmpty(post.spec.cover)},
+              coverSizes = ${'(max-width: 860px) 46vw, 300px'}
+            "
+          >
+            <th:block
+              th:replace="~{modules/index/card-stamp :: card(${post}, ${cardStat}, ${isA}, ${hasCover}, ${whoName}, ${emoji}, ${coverSizes}, ${eagerName})}"
+            />
+          </th:block>
+        </th:block>
+
+        
+        <th:block th:with="blankCount=${(3 - #lists.size(posts.items) % 3) % 3}">
+          <a
+            class="wqs-stampcell wqs-stampcell--blank"
+            th:if="${blankCount >= 1}"
+            th:href="${!#strings.isEmpty(aTok) ? '/authors/' + aTok : null}"
+            th:aria-label="${#messages.msg('footer.desk')}"
+          >
+            <span class="wqs-stampcell__ph wqs-stampcell__ph--blank" aria-hidden="true"></span>
+            <span class="wqs-stampcell__title" th:text="${#messages.msg('stamps.blank')}">待贴</span>
+            <span class="wqs-stampcell__date" aria-hidden="true">· · ·</span>
+          </a>
+          <a
+            class="wqs-stampcell wqs-stampcell--blank"
+            th:if="${blankCount >= 2}"
+            th:href="${!#strings.isEmpty(bTok) ? '/authors/' + bTok : null}"
+            th:aria-label="${#messages.msg('footer.desk')}"
+          >
+            <span class="wqs-stampcell__ph wqs-stampcell__ph--blank" aria-hidden="true"></span>
+            <span class="wqs-stampcell__title" th:text="${#messages.msg('stamps.blank')}">待贴</span>
+            <span class="wqs-stampcell__date" aria-hidden="true">· · ·</span>
+          </a>
+        </th:block>
+      </div>
+    </div>
+  </section>
+
+  
+  <th:block th:if="${cfg.home.show_knot}">
+    <th:block th:replace="~{modules/index/knot :: knot(${rnd}, ${posts})}" />
+  </th:block>
+</th:block>

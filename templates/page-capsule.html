@@ -1,0 +1,54 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  xmlns:halo="https://halo.run/schema/thymeleaf"
+  th:replace="~{modules/layout :: html(content = ~{::content}, pageTitle = ${singlePage.spec.title})}"
+>
+  
+
+  <th:block
+    th:fragment="content"
+    th:with="todayStr = ${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}, allPosts = ${postFinder.listAll()}"
+  >
+  <th:block th:replace="~{modules/layout :: chead(label=|${singlePage.spec.title}|)}" />
+    <section class="wqs-capsule" th:aria-label="${#messages.msg('a11y.capsule')}">
+      <header class="wqs-capsule__head">
+        <h1 class="wqs-capsule__title" th:text="${singlePage.spec.title}">时间胶囊</h1>
+        <div class="wqs-capsule__intro t-post__content" th:if="${!#strings.isEmpty(singlePage.content.content)}" th:utext="${singlePage.content.content}"></div>
+      </header>
+
+      <div class="wqs-capsule__track">
+        <th:block th:each="p : ${allPosts}" th:if="${#annotations.contains(p, 'capsule_date')}">
+          <th:block th:with="capDate = ${#annotations.get(p, 'capsule_date')}, locked = ${capDate != null and capDate > todayStr}">
+            
+            <article class="wqs-capsule__card wqs-capsule__card--locked" th:if="${locked}">
+              <span class="wqs-capsule__seal" aria-hidden="true">💌</span>
+              <b class="wqs-capsule__to">
+                <span th:text="${#messages.msg('capsule.toPrefix')}">给</span>
+                <span th:text="${#annotations.getOrDefault(p, 'capsule_to', #messages.msg('capsule.toDefault'))}">未来的我们</span>
+              </b>
+              <span class="wqs-capsule__date" th:text="${capDate}">2027-05-20</span>
+              <span class="wqs-capsule__count">
+                <span th:text="${#messages.msg('capsule.countPrefix')}">还有</span>
+                <b class="tabular" th:attr="data-wqs-capsule-date=${capDate}">--</b>
+                <span th:text="${#messages.msg('capsule.countSuffix')}">天启封</span>
+              </span>
+            </article>
+            
+            <a class="wqs-capsule__card wqs-capsule__card--open" th:if="${!locked}" th:href="@{${p.status.permalink}}">
+              <span class="wqs-capsule__seal" aria-hidden="true">✉️</span>
+              <b class="wqs-capsule__to" th:text="${p.spec.title}">信的标题</b>
+              <span class="wqs-capsule__date" th:text="${capDate}">2027-05-20</span>
+              <span class="wqs-capsule__openhint" th:text="${#messages.msg('capsule.openHint')}">已启封 · 点开读信</span>
+            </a>
+          </th:block>
+        </th:block>
+        
+        <span class="wqs-capsule__empty" role="status">
+          <span aria-hidden="true">💌</span>
+          <span th:text="${#messages.msg('capsule.empty')}">还没有信在路上。</span>
+        </span>
+      </div>
+    </section>
+  </th:block>
+</html>

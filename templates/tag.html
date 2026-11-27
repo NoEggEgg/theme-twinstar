@@ -1,0 +1,72 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(content = ~{::content}, pageTitle = ${tag.spec.displayName})}"
+>
+  
+
+  <th:block th:fragment="content">
+  <th:block th:replace="~{modules/layout :: chead(label=|${#messages.msg('page.tags')} · ${tag.spec.displayName}|)}" />
+    
+    <header
+      class="wqs-pagehead wqs-pagehead--tax"
+      th:style="${tag.spec.color != null and #strings.startsWith(tag.spec.color, '#') ? '--tax-ink:' + tag.spec.color : null}"
+      th:with="tagCover = ${tag.spec.cover != null ? tag.spec.cover : ''}"
+    >
+      <div class="wqs-pagehead__main">
+        <h1 th:text="${tag.spec.displayName}">标签名</h1>
+        <p class="wqs-pagehead__sub" th:text="${#messages.msg('taxonomy.total', posts.total)}">共 12 封信</p>
+      </div>
+      <figure class="wqs-pagehead__cover" th:if="${!#strings.isEmpty(tagCover)}">
+        <img th:src="${tagCover}" alt="" loading="lazy" />
+      </figure>
+    </header>
+
+    <div class="wqs-minipost">
+      <article
+        class="wqs-minipost__card"
+        th:classappend="${'wqs-minipost__card--' + (st.index % 2 == 0 ? 'l' : 'r')}"
+        th:with="coverSizes=${'(max-width: 860px) 92vw, 440px'}"
+        th:each="post, st : ${posts.items}"
+      >
+        <a
+          class="wqs-minipost__cover"
+          th:classappend="${!#strings.isEmpty(post.spec.cover) ? '' : 'wqs-minipost__cover--ph'}"
+          th:href="@{${post.status.permalink}}"
+        >
+          <th:block th:if="${!#strings.isEmpty(post.spec.cover)}">
+            <th:block
+              th:replace="~{modules/cover-img :: img(${post.spec.cover}, ${post.spec.title}, 'wqs-minipost', '', ${coverSizes}, ${st.index < 2})}"
+            />
+          </th:block>
+        </a>
+        <h2 class="wqs-minipost__title">
+          <a th:href="@{${post.status.permalink}}" th:text="${post.spec.title}">文章标题</a>
+        </h2>
+        <p class="wqs-minipost__ex" th:if="${cfg.home.show_excerpt and !#strings.isEmpty(post.status.excerpt)}" th:text="${post.status.excerpt}">摘要</p>
+        <p class="wqs-minipost__meta">
+          <span
+            class="wqs-halo wqs-halo--solo wqs-minipost__face wqs-mono"
+            aria-hidden="true"
+            th:attr="data-wqs-mono='x', data-wqs-mono-name=${post.owner != null ? post.owner.displayName : ''}"
+          >
+            <span class="wqs-halo__av">
+              <img th:if="${post.owner != null and !#strings.isEmpty(post.owner.avatar)}" th:src="${post.owner.avatar}" alt="" />
+              <span class="wqs-mono__emoji" th:if="${post.owner == null}" aria-hidden="true"></span>
+              <span class="wqs-mono__ch" aria-hidden="true"></span>
+            </span>
+          </span>
+          <span class="wqs-minipost__who" th:if="${post.owner != null}" th:text="${post.owner.displayName}">作者</span>
+          <time
+            class="wqs-minipost__date tabular"
+            th:attr="datetime=${post.spec.publishTime}"
+            th:text="${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd')}"
+          >2026-01-01</time>
+        </p>
+      </article>
+    </div>
+
+    <p class="t-empty" role="status" th:if="${#lists.isEmpty(posts.items)}" th:text="${#messages.msg('common.noPosts')}">暂无文章。</p>
+    <th:block th:replace="~{modules/pager :: pager(base=${'/tags/' + tag.spec.slug}, pageNo=${posts.page}, totalNo=${posts.totalPages})}" />
+  </th:block>
+</html>

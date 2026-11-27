@@ -1,0 +1,15 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(content = ~{::content}, pageTitle = ${#messages.msg('page.categories')})}"
+>
+  
+
+  <th:block th:fragment="content">
+  <th:block th:replace="~{modules/layout :: chead(label=${#messages.msg('page.categories')})}" />
+    <header class="wqs-pagehead"><h1 th:text="${#messages.msg('page.categories')}">分类</h1></header>
+
+    
+    <th:block th:replace="~{modules/taxonomy/category-tree :: tree(${categories}, false)}" />
+  </th:block>
+</html>

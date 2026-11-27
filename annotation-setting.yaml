@@ -1,0 +1,78 @@
+apiVersion: v1alpha1
+kind: AnnotationSetting
+metadata:
+  # ⚠️ metadata.name 是实例内唯一资源名，必须随主题 slug 走（init 时替换为 <slug>-post-type）。
+  #    曾硬编码 theme-demo-post-type——同一 Halo 实例装两个本脚手架主题即撞名（2026-10-31 修正）。
+  name: theme-twinstar-post-type
+spec:
+  targetRef:
+    group: content.halo.run
+    kind: Post
+  formSchema:
+    # 注解键位只留真实消费点（RETHINK-v5 §三）；示例类死配置（post_type）已清除。
+    # 模板消费用官方 #annotations 工具，
+    # 参考 https://docs.halo.run/developer-guide/theme/annotations.md 。
+
+    # ---- 里程碑（PLAN M2）：index 里程碑时间轴消费 ----
+    # 模板消费：#annotations.contains(post, 'milestone_date') 过滤（见 src/templates/index.html）。
+    - $formkit: text
+      name: milestone_date
+      key: milestone_date_field
+      label: 里程碑 · 日期
+      help: 填写后本文会成为首页里程碑节点。格式 YYYY-MM-DD（事件发生日，可与发布日不同）。
+    - $formkit: text
+      name: milestone_title
+      key: milestone_title_field
+      label: 里程碑 · 标语
+      help: 不填则用文章标题。
+    - $formkit: text
+      name: milestone_emoji
+      key: milestone_emoji_field
+      label: 里程碑 · emoji
+      help: 不填则显示 ✦。
+
+    # ---- 各拍一半封面：v8 起改为单封面（只读 post.spec.cover），
+    #      cover_a/cover_b 不再被任何模板消费 → 编辑界面已移除这两个字段。
+    #      老文章注解值仍留在数据里，不迁移、不展示（docs/phase2/spec.md）。 ----
+
+    # ---- 默契问答：v2.0.0 砍掉（RETHINK §四）——以下 4 键留档 dead，
+    #      老文章注解值仍在 ConfigMap/注解中，模板不再消费。 ----
+
+    # ---- 时间胶囊（PLAN M3）：信 = 带 capsule_date 注解的文章 ----
+    # 消费点：page-capsule.html（胶囊页列表）与 post.html（直达访问的模板层拦截）。
+    # ⚠️ 未到期时信文不进 HTML（铁律 4）。⚠️ 信文必须写在 capsule_body 注解里——
+    #   Halo 会把「正文」自动注入 <meta description>（2026-11-02 实证泄露点），
+    #   正文框只留占位文字；解锁后信文以纯文本信纸渲染（white-space: pre-line）。
+    - $formkit: text
+      name: capsule_to
+      key: capsule_to_field
+      label: 胶囊 · 写给谁
+      help: 如「五周年的小满」。不填则显示通用文案。
+    - $formkit: text
+      name: capsule_date
+      key: capsule_date_field
+      label: 胶囊 · 启封日
+      help: YYYY-MM-DD。填写后本文成为时间胶囊信。⚠️ 到期判定按**服务器时区**的今天（建议部署容器 TZ=Asia/Shanghai，或时区 ≤ +08:00——只会晚开不会早开）。
+    - $formkit: textarea
+      name: capsule_body
+      key: capsule_body_field
+      label: 胶囊 · 信文（写在注解里）
+      help: 信文写在这里，到期前不会出现在任何页面。⚠️ 注解会随公开文章 API 可见（Halo 平台行为）——要绝对保密请用「到期当天才发布」：写好存草稿，纪念日当天发布，主题按日期自动显示为已启封。上方正文框留占位即可。
+
+    # ---- 信头系统（PLAN M7c）：标题下方「——写给 XX」/ 双人合写署名 ----
+    - $formkit: text
+      name: letter_to
+      key: letter_to_field
+      label: 信头 · 写给
+      help: 填写后文章标题下渲染一行「——写给 XX」。留空不显示。
+    - $formkit: select
+      name: co_authored
+      key: co_authored_field
+      label: 双人合写
+      value: "no"
+      options:
+        - label: 否
+          value: "no"
+        - label: 是（署名显示两人）
+          value: "yes"
+      help: 「是」则署名行显示两个人的名字与署名色（适合你们共同完成的文章）。

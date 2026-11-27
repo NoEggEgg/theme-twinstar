@@ -1,0 +1,301 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(content = ~{::content}, pageTitle = ${#messages.msg('wishes.title')})}"
+>
+  
+  <th:block
+    th:fragment="content"
+    th:with="pageSize = ${20}, wishesResult = ${twgFinder.wishes(page, pageSize)}, wishTotal = ${twgFinder.wishCount()}"
+  >
+  <th:block th:replace="~{modules/layout :: chead(label=${#messages.msg('wishes.title')})}" />
+    <style>
+      /* 纸条信箱（Phase 4 编辑台）：便签平放、去图钉/胶带/折角/倾斜；
+         全部引用 wqs/t 令牌；卡片只做边框过渡。 */
+      .twg-page__head { text-align: left; margin: 0 0 4px; }
+      .twg-page__head h1 {
+        font-family: var(--t-font-serif); font-weight: 700;
+        font-size: var(--t-fs-page); letter-spacing: 0.06em;
+        margin: 0;
+      }
+      .twg-page__head p {
+        margin: 6px 0 0; color: var(--t-text-secondary);
+        font-size: var(--t-fs-meta); line-height: 1.6;
+      }
+      .twg-toolbar {
+        display: flex; align-items: baseline; justify-content: space-between;
+        gap: 10px; margin: 18px 0 14px; padding-bottom: 10px;
+        border-bottom: 1px solid var(--t-border);
+      }
+      .twg-count {
+        font-family: var(--t-font-mono); font-size: var(--t-fs-micro);
+        letter-spacing: 0.06em; color: var(--t-text-secondary);
+      }
+      .twg-count b {
+        font-family: var(--t-font-mono); color: var(--t-wax);
+        font-size: var(--t-fs-body); font-variant-numeric: tabular-nums;
+      }
+      .twg-btn-draw {
+        display: inline-flex; align-items: center; gap: 6px;
+        border: 0; border-radius: 0; background: none;
+        color: var(--t-primary-view, var(--t-primary));
+        padding: 4px 0; font-family: var(--t-font-mono);
+        font-size: var(--t-fs-caps); letter-spacing: 0.08em; cursor: pointer;
+        transition: color var(--wqs-dur-fast) var(--wqs-ease);
+      }
+      .twg-btn-draw:hover {
+        color: var(--wqs-view-ink); text-decoration: underline; text-underline-offset: 3px;
+      }
+      .twg-wall { columns: 3 240px; column-gap: 16px; }
+      .twg-note {
+        display: inline-block; width: 100%; margin: 0 0 16px; break-inside: avoid;
+        background: var(--t-surface);
+        border: 1px solid var(--t-border); border-radius: 6px;
+        padding: 16px; position: relative;
+        box-shadow: var(--t-shadow-card);
+        transition: border-color var(--wqs-dur-fast) var(--wqs-ease);
+      }
+      .twg-note:hover { border-color: var(--t-border-strong); }
+      /* 置顶 = 2px 视角墨顶边，替代图钉/胶带 */
+      .twg-note--pinned { border-top: 2px solid var(--wqs-view-ink); }
+      .twg-note__text { font-family: var(--t-font-kai); font-size: var(--t-fs-body); line-height: 1.9; margin: 0; }
+      .twg-note__meta {
+        display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+        margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--t-border);
+      }
+      .twg-note__who {
+        font-family: var(--t-font-kai); font-size: var(--t-fs-micro);
+        color: var(--t-text-secondary);
+      }
+      .twg-note__date {
+        font-family: var(--t-font-mono); font-size: var(--t-fs-micro);
+        letter-spacing: 0.04em; color: var(--t-text-secondary);
+        font-variant-numeric: tabular-nums;
+      }
+      .twg-note--drawn { outline: 2px solid var(--wqs-view-ink); outline-offset: 3px; }
+      .twg-empty {
+        display: flex; flex-direction: column; align-items: center; gap: 8px;
+        margin-top: 14px; padding: 26px 16px;
+        border: 1px dashed var(--t-border-strong); border-radius: 2px;
+        color: var(--t-text-secondary); font-size: var(--t-fs-micro);
+        letter-spacing: 0.06em; text-align: center;
+      }
+      .twg-form {
+        background: var(--t-surface); border: 1px solid var(--t-border); border-radius: 6px;
+        padding: 18px 16px; position: relative;
+        box-shadow: var(--t-shadow-card); margin: 0 0 16px;
+      }
+      .twg-form h3 {
+        margin: 0 0 10px; font-family: var(--t-font-serif);
+        font-size: var(--t-fs-card); font-weight: 700; letter-spacing: 0.06em;
+      }
+      .twg-form__label {
+        font-family: var(--t-font-mono); font-size: var(--t-fs-caps);
+        letter-spacing: 0.04em; color: var(--t-text-secondary);
+      }
+      .twg-form textarea {
+        width: 100%; min-height: 96px; resize: vertical;
+        border: 1px solid var(--t-border); border-radius: 4px; padding: 10px 12px;
+        font-family: var(--t-font-kai); font-size: var(--t-fs-body); color: var(--t-text);
+        /* 手写信纸行线：行高 28px 与横线周期对齐（打字即写在格线上） */
+        background: repeating-linear-gradient(180deg,
+          transparent 0 27px, color-mix(in srgb, var(--t-text) 8%, transparent) 27px 28px),
+          var(--t-surface-2);
+      }
+      .twg-form textarea:focus-visible { outline: 2px solid var(--wqs-view-ink); outline-offset: 1px; }
+      .twg-form input[type="text"] {
+        width: 100%; margin-top: 6px;
+        border: 1px solid var(--t-border); border-radius: 4px; padding: 8px 12px;
+        font-family: var(--t-font-kai); font-size: var(--t-fs-meta); color: var(--t-text);
+        background: var(--t-surface-2);
+      }
+      .twg-form input[type="text"]:focus-visible { outline: 2px solid var(--wqs-view-ink); outline-offset: 1px; }
+      .twg-form__row {
+        display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end;
+        gap: 10px; margin-top: 14px;
+      }
+      .twg-seal {
+        border: none; background: var(--t-wax);
+        color: color-mix(in srgb, #ffffff 88%, var(--t-bg));
+        font-family: var(--t-font-kai); font-weight: 700;
+        letter-spacing: 0.2em; border-radius: 2px; padding: 10px 22px;
+        /* 火漆单圈：铜金细边 + 纸影 */
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--t-craft) 60%, transparent),
+          var(--t-shadow-card);
+        cursor: pointer;
+      }
+      .twg-seal:active { transform: translateY(1px); }
+      .twg-form__foot {
+        margin: 10px 0 0; font-family: var(--t-font-mono);
+        font-size: var(--t-fs-caps); letter-spacing: 0.04em; color: var(--t-text-secondary);
+      }
+      .twg-duo { text-align: left; padding: 10px 0 2px; }
+      .twg-duo span { font-size: var(--t-fs-caps); letter-spacing: 0.3em; color: var(--t-text-secondary); }
+      .twg-duo i { display: block; height: 1px; margin-top: 6px; background: var(--t-border); }
+      .twg-toast {
+        position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%);
+        background: var(--t-text); color: var(--t-bg);
+        padding: 10px 20px; border-radius: 4px; font-size: var(--t-fs-meta);
+        z-index: 120; opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+      }
+      .twg-toast--on { opacity: 1; }
+      /* 双列布局：桌面 = 墙 1fr + 信封 300px；窄屏单列且信封前置（先写后读） */
+      .twg-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 300px); gap: 18px; align-items: start; }
+      .twg-form { order: 2; }
+      /* 本页已有内联表单——隐藏全站注入的浮钮，避免同屏两个入口 */
+      body:has(.twg-form) .twg-entry { display: none; }
+      @media (max-width: 640px) {
+        .twg-grid { grid-template-columns: minmax(0, 1fr); }
+        .twg-form { order: -1; }
+        .twg-wall { columns: 1; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .twg-note, .twg-seal:active { transition: none; transform: none; }
+      }
+    </style>
+
+    <header class="twg-page__head">
+      <h1 th:text="${#messages.msg('wishes.title')}">纸条信箱</h1>
+      <p th:text="${#messages.msg('wishes.sub')}">写给两个人的话，会贴在他们的信箱上。</p>
+    </header>
+
+    <div class="twg-toolbar">
+      <span class="twg-count">
+        <b th:text="${wishTotal}">0</b>
+        <span th:text="${#messages.msg('wishes.countSuffix')}">张纸条</span>
+      </span>
+      <button
+        type="button"
+        class="twg-btn-draw"
+        data-wg-draw
+        th:if="${page == 1 and wishTotal > 0}"
+        th:text="${'✦ ' + #messages.msg('wishes.draw')}"
+      >✦ 抽一张</button>
+    </div>
+
+    <div class="twg-grid">
+      <div>
+        <div class="twg-wall" data-wg-wall>
+          <article
+            th:each="w : ${wishesResult.items}"
+            class="twg-note"
+            th:classappend="${w.pinned ? ' twg-note--pinned' : ''}"
+          >
+            <p class="twg-note__text" th:text="${w.content}">祝福内容</p>
+            <div class="twg-note__meta">
+              <span class="twg-note__who">— <span th:text="${w.nickname == '' ? #messages.msg('wishes.anon') : w.nickname}">匿名</span></span>
+              <span
+                class="twg-note__date"
+                th:if="${w.createdAt != null}"
+                th:text="${#temporals.format(w.createdAt, 'MM-dd')}"
+              >MM-dd</span>
+            </div>
+          </article>
+        </div>
+        <div class="twg-empty" data-wg-empty th:if="${wishTotal == 0}">
+          <span style="font-size: 34px" aria-hidden="true">✉</span>
+          <span th:text="${#messages.msg('wishes.empty')}">信箱还空着 —— 投出第一条纸条。</span>
+        </div>
+      </div>
+
+      <aside class="twg-form" th:attr="aria-label=${#messages.msg('wishes.formTitle')}">
+        <h3 th:text="${'✉ ' + #messages.msg('wishes.formTitle')}">✉ 写一张纸条</h3>
+        <label class="twg-form__label" for="twg-content" th:text="${#messages.msg('wishes.formLabel')}">写给两个人的话（140 字内）</label>
+        <textarea id="twg-content" maxlength="140" th:attr="placeholder=${#messages.msg('wishes.placeholder')}" placeholder="落笔即是心意……"></textarea>
+        <label class="twg-form__label" for="twg-nickname" th:text="${#messages.msg('wishes.signLabel')}">署名（留空即匿名）</label>
+        <input
+          id="twg-nickname"
+          type="text"
+          maxlength="20"
+          autocomplete="nickname"
+          th:attr="placeholder=${#messages.msg('wishes.signPlaceholder')}"
+          placeholder="你的称呼（选填）"
+        />
+        <div class="twg-form__row">
+          <button type="button" class="twg-seal" data-wg-seal th:text="${#messages.msg('wishes.send')}">落印寄出</button>
+        </div>
+        <p class="twg-form__foot" th:text="${#messages.msg('wishes.foot')}">提交后进入审核 · 通过即盖邮戳上墙</p>
+      </aside>
+    </div>
+
+    <nav
+      class="t-pagination"
+      th:if="${wishesResult.hasPrevious() or wishesResult.hasNext()}"
+      th:aria-label="${#messages.msg('wishes.pagination')}"
+    >
+      <a
+        class="t-pagination__prev"
+        th:if="${wishesResult.hasPrevious()}"
+        th:href="@{'/wishes(page=' + ${page - 1} + ')'}"
+        th:text="${#messages.msg('common.previousPage')}"
+      >上一页</a>
+      <a
+        class="t-pagination__next"
+        th:if="${wishesResult.hasNext()}"
+        th:href="@{'/wishes(page=' + ${page + 1} + ')'}"
+        th:text="${#messages.msg('common.nextPage')}"
+      >下一页</a>
+    </nav>
+
+    <div class="twg-duo"><span th:text="${#messages.msg('wishes.duo')}">双 星 引 力</span><i aria-hidden="true"></i></div>
+
+    <div
+      class="twg-toast"
+      data-wg-toast
+      role="status"
+      th:attr="data-wg-msg-ok=${#messages.msg('wishes.toastOk')}, data-wg-msg-full=${#messages.msg('wishes.toastFull')}, data-wg-msg-fail=${#messages.msg('wishes.toastFail')}"
+    ></div>
+
+    
+    <script th:if="${page == 1}">
+      (function () {
+        var toast = document.querySelector('[data-wg-toast]');
+        var msgOk = (toast && toast.getAttribute('data-wg-msg-ok')) || '';
+        var msgFull = (toast && toast.getAttribute('data-wg-msg-full')) || '';
+        var msgFail = (toast && toast.getAttribute('data-wg-msg-fail')) || '';
+        var showToast = function (msg) {
+          if (!toast) return;
+          toast.textContent = msg;
+          toast.classList.add('twg-toast--on');
+          window.setTimeout(function () { toast.classList.remove('twg-toast--on'); }, 2600);
+        };
+        var draw = document.querySelector('[data-wg-draw]');
+        draw && draw.addEventListener('click', function () {
+          var notes = document.querySelectorAll('[data-wg-wall] .twg-note');
+          if (!notes.length) return;
+          notes.forEach(function (n) { n.classList.remove('twg-note--drawn'); });
+          var one = notes[Math.floor(Math.random() * notes.length)];
+          one.classList.add('twg-note--drawn');
+          one.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+        var seal = document.querySelector('[data-wg-seal]');
+        var text = document.querySelector('#twg-content');
+        var nickname = document.querySelector('#twg-nickname');
+        seal && seal.addEventListener('click', function () {
+          var v = (text && text.value || '').trim();
+          if (!v) { text && text.focus(); return; }
+          fetch('/apis/api.twinstar-gravity.halo.run/v1alpha1/wishes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              content: v,
+              nickname: (nickname && nickname.value || '').trim()
+            })
+          }).then(function (r) {
+            if (r.status === 201) {
+              showToast(msgOk);
+              if (text) text.value = '';
+              if (nickname) nickname.value = '';
+            } else if (r.status === 429) {
+              showToast(msgFull);
+            } else {
+              showToast(msgFail);
+            }
+          }).catch(function () {
+            showToast(msgFail);
+          });
+        });
+      })();
+    </script>
+  </th:block>
+</html>

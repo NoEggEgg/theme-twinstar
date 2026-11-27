@@ -1,0 +1,12 @@
+
+<ul class="t-cattree" th:classappend="${sub} ? 't-cattree--sub'" th:fragment="tree(categories, sub)">
+  <li class="t-cattree__node" th:each="cat : ${categories}">
+    <div class="t-cattree__row">
+      <a class="t-cattree__name" th:href="@{${cat.status.permalink}}" th:text="${cat.spec.displayName}">分类名</a>
+      <span class="t-cattree__count tabular" th:text="${cat.postCount}">0</span>
+    </div>
+    <th:block th:if="${cat.children != null and !#lists.isEmpty(cat.children)}">
+      <th:block th:replace="~{modules/taxonomy/category-tree :: tree(${cat.children}, true)}" />
+    </th:block>
+  </li>
+</ul>

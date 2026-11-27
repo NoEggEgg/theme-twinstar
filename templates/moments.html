@@ -1,0 +1,71 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  xmlns:halo="https://halo.run/schema/thymeleaf"
+  th:replace="~{modules/layout :: html(content = ~{::content}, pageTitle = ${#messages.msg('moments.title')})}"
+>
+  
+
+  <th:block
+    th:fragment="content"
+    th:with="
+      aMap = ${',' + #strings.replace(cfg.couple.partner_a_author, ' ', '') + ','},
+      bMap = ${',' + #strings.replace(cfg.couple.partner_b_author, ' ', '') + ','}
+    "
+  >
+    <section class="wqs-moments" th:aria-label="${#messages.msg('a11y.moments')}">
+  <th:block th:replace="~{modules/layout :: chead(label=${#messages.msg('moments.title')})}" />
+      <header class="wqs-pagehead">
+        <h1 class="wqs-pagehead__title" th:text="${#messages.msg('moments.title')}">瞬间</h1>
+        <p class="wqs-pagehead__sub" th:text="${#messages.msg('moments.sub')}">随手记下的星星尘。</p>
+      </header>
+
+      
+      <nav class="wqs-tabs" th:if="${!#lists.isEmpty(tags)}" th:aria-label="${#messages.msg('a11y.momentTags')}">
+        <a
+          class="wqs-tabs__tab"
+          th:href="@{/moments}"
+          th:classappend="${#arrays.isEmpty(param.tag) ? 'is-active' : ''}"
+        >
+          <span th:text="${#messages.msg('moments.allTags')}">全部</span>
+        </a>
+        <a
+          class="wqs-tabs__tab"
+          th:each="tag : ${tags}"
+          th:href="${tag.permalink}"
+          th:classappend="${param.tag != null and #arrays.contains(param.tag, tag.name) ? 'is-active' : ''}"
+        >
+          <span th:text="${tag.name}">标签名</span>
+          <span class="wqs-tabs__num tabular" th:text="${tag.momentCount}">1</span>
+        </a>
+      </nav>
+
+      <ol class="wqs-moments__list">
+        <li
+          th:each="m, mStat : ${moments.items}"
+          th:with="isA = ${m.owner != null and (#strings.contains(aMap, ',' + m.owner.name + ',') or #strings.contains(aMap, ',' + m.owner.displayName + ',') or m.owner.displayName == cfg.couple.partner_a_name or (!#strings.isEmpty(cfg.couple.partner_a_name) and (#strings.contains(#strings.trim(m.owner.displayName), #strings.trim(cfg.couple.partner_a_name)) or #strings.contains(#strings.trim(cfg.couple.partner_a_name), #strings.trim(m.owner.displayName)))))}, isB = ${m.owner != null and !isA and (#strings.contains(bMap, ',' + m.owner.name + ',') or #strings.contains(bMap, ',' + m.owner.displayName + ',') or m.owner.displayName == cfg.couple.partner_b_name)}, toneCls = ${isA ? 'is-a' : (isB ? 'is-b' : 'is-x')}, toneEmoji = ${isA ? cfg.couple.partner_a_emoji : (isB ? cfg.couple.partner_b_emoji : '✦')}"
+        >
+          
+          <p
+            class="wqs-moments__month"
+            th:if="${mStat.first or (mStat.index > 0 and #temporals.format(m.spec.releaseTime, 'yyyy-MM') != #temporals.format(moments.items[mStat.index - 1].spec.releaseTime, 'yyyy-MM'))}"
+          >
+            <span th:text="${#temporals.format(m.spec.releaseTime, 'yyyy 年 M 月')}">2026 年 11 月</span>
+          </p>
+          <th:block th:insert="~{modules/moment-card :: card(${m}, ${toneCls}, ${toneEmoji})}" />
+        </li>
+      </ol>
+
+      
+      <p class="wqs-empty" role="status" th:if="${#lists.isEmpty(moments.items)}">
+        <span aria-hidden="true">✨</span>
+        <span th:text="${#messages.msg('moments.empty')}">还没有留下瞬间 —— 第一个瞬间值得被记录。</span>
+      </p>
+
+      <nav class="t-pagination" th:if="${moments.hasPrevious() or moments.hasNext()}" th:aria-label="${#messages.msg('a11y.pagination')}">
+        <a class="t-pagination__prev" th:if="${moments.hasPrevious()}" th:href="${moments.prevUrl}" th:text="${#messages.msg('common.previousPage')}">上一页</a>
+        <a class="t-pagination__next" th:if="${moments.hasNext()}" th:href="${moments.nextUrl}" th:text="${#messages.msg('common.nextPage')}">下一页</a>
+      </nav>
+    </section>
+  </th:block>
+</html>

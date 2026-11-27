@@ -1,0 +1,492 @@
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  # ⚠️ 必须与 theme.yaml 的 spec.settingName 一致。
+  # ⚠️ 三条铁规矩（theme-Flux 用 226 个键换来的教训）：
+  #   1. key 命名必须是路径式「<组>[_<嵌套>…]_<字段>_field」（check:form R8 拦截）；
+  #   2. 字段名 name 全组唯一——重复 name 中止整轮 reconcile；
+  #   3. group 是 ConfigMap 的键，发布后应保持稳定。v7.0.0 重组分组时
+  #      用 scripts/migrate-settings.mjs 迁移旧值（days / home 为新增组）。
+  # ============================================================
+  # v7.1.0 分组：8 组 · 50 键（v7.0 的 51 键移除「页脚导航」）。按「身份 → 日子 → 首页 → 外观 → 阅读 →
+  # 导航页脚 → 动效 → 搜索」排列；导航用 menuSelect 直选 Halo 菜单，
+  # 庆祝日/里程碑改用 list 结构化存储，日期改用 date 选择器。
+  # ============================================================
+  name: theme-twinstar-setting
+spec:
+  forms:
+    - group: appearance
+      label: 外观与排版
+      formSchema:
+        - $formkit: select
+          id: color_scheme
+          name: color_scheme
+          key: appearance_color_scheme_field
+          label: 配色模式
+          value: auto
+          options:
+            - label: 跟随系统（推荐）
+              value: auto
+            - label: 恒亮信纸
+              value: light
+            - label: 夜访者暗纸
+              value: dark
+          help: 只作用于页身纸面；页顶天空的光线仍按时间走。
+
+        - $formkit: color
+          name: primary_color
+          key: appearance_primary_color_field
+          label: 主色
+          value: "#b23f62"
+          help: 站点主色。链接、强调元素与品牌色（默认玫瑰红，对比度已验证）。
+
+        - $formkit: select
+          name: title_face
+          key: appearance_title_face_field
+          label: 标题字体
+          value: kai
+          options:
+            - label: 文楷（默认，手写体温）
+              value: kai
+            - label: 宋体（书卷气）
+              value: serif
+            - label: 黑体（现代简洁）
+              value: sans
+          help: 只换标题与刊头的字面，正文仍是文楷。
+
+        - $formkit: select
+          name: grain_level
+          key: appearance_grain_level_field
+          label: 纸面颗粒
+          value: "4"
+          options:
+            - label: 关闭（纯平纸面）
+              value: "0"
+            - label: 轻（隐约纸纹）
+              value: "2"
+            - label: 标准（推荐）
+              value: "4"
+            - label: 浓（旧纸手感）
+              value: "7"
+          help: 全站细颗粒纸纹强度。关闭后画面更干净，适合 OLED 与截图分享。
+
+        - $formkit: select
+          name: font_scale
+          key: appearance_font_scale_field
+          label: 字号缩放
+          value: normal
+          options:
+            - label: 标准（100%）
+              value: normal
+            - label: 大（106%）
+              value: large
+            - label: 特大（112%）
+              value: xlarge
+          help: 全站字号整体缩放，排版结构与栏宽不变。
+
+    - group: couple
+      label: 两个人的身份
+      formSchema:
+        # 署名色是全站唯一的「谁写的」视觉编码（文章卡 / 瞬间 / 故事页同源）。
+        - $formkit: text
+          name: partner_a_name
+          key: couple_partner_a_name_field
+          label: TA 的名字（A）
+          value: 小坏蛋
+          help: 署名与署名色优先按下方「A 侧作者」匹配；未选作者时按此显示名匹配。
+
+        - $formkit: attachment
+          name: partner_a_avatar
+          key: couple_partner_a_avatar_field
+          label: A 的头像
+          help: 不填则取 TA 的账号头像；账号头像也没有才用下方 emoji。建议 1:1 方图。
+
+        - $formkit: text
+          name: partner_a_emoji
+          key: couple_partner_a_emoji_field
+          label: A 的 emoji（头像兜底）
+          value: 🐰
+
+        - $formkit: color
+          name: partner_a_tone
+          key: couple_partner_a_tone_field
+          label: A 的署名色
+          value: "#8fb7ff"
+          help: 文章卡、文章页与瞬间的署名点与署名文字。
+
+        - $formkit: text
+          name: partner_b_name
+          key: couple_partner_b_name_field
+          label: TA 的名字（B）
+          value: 小乖乖
+
+        - $formkit: attachment
+          name: partner_b_avatar
+          key: couple_partner_b_avatar_field
+          label: B 的头像
+          help: 不填则取 TA 的账号头像；账号头像也没有才用下方 emoji。建议 1:1 方图。
+
+        - $formkit: text
+          name: partner_b_emoji
+          key: couple_partner_b_emoji_field
+          label: B 的 emoji（头像兜底）
+          value: 🐱
+
+        - $formkit: color
+          name: partner_b_tone
+          key: couple_partner_b_tone_field
+          label: B 的署名色
+          value: "#ff8fae"
+          help: 文章卡、文章页与瞬间的署名点与署名文字。
+
+        - $formkit: text
+          name: mast_heart
+          key: couple_mast_heart_field
+          label: 报头心形符号
+          value: ""
+          help: 首页报头两个人名之间的符号。留空 = 主题绘制的双星心形；可填 ❤️ ✦ ∞ 等字符。
+
+        - $formkit: text
+          name: mast_suffix
+          key: couple_mast_suffix_field
+          label: 报头后缀
+          value: ""
+          help: 接在 B 的名字后的称谓。留空不显示；可填「的博客」「的小家」「的来信」等。
+
+        # 作者映射——双墨侧向的判定键。不填时回退「显示名 = 配置名」精确匹配。
+        - $formkit: userSelect
+          name: partner_a_author
+          key: couple_partner_a_author_field
+          label: A 侧作者
+          value: ""
+          help: 下拉选择 A 侧作者账号。选中即左靠 A 墨；「写了 N 封信」计数与信桌链接也需要选中后才会出现。
+
+        - $formkit: userSelect
+          name: partner_b_author
+          key: couple_partner_b_author_field
+          label: B 侧作者
+          value: ""
+          help: 下拉选择 B 侧作者账号。未命中 A 侧的文章默认归 B 侧；信桌链接同样依赖此映射。
+
+    - group: days
+      label: 日子与情话
+      formSchema:
+        - $formkit: date
+          name: anniversary_date
+          key: days_anniversary_date_field
+          label: 在一起的日子
+          value: "2020-05-20"
+          help: 天数与纪念日倒计时按此日期 + 下方时区固定计算，与访客时区无关。
+
+        - $formkit: text
+          name: timezone
+          key: days_timezone_field
+          label: 恋爱时区
+          value: "+08:00"
+          help: UTC 偏移（如 +08:00）。天数以此时区的「今天」计算，海外访客看到的数字一致。
+
+        - $formkit: list
+          name: celebrations
+          key: days_celebrations_field
+          label: 庆祝日（纪念日 / 生日）
+          itemType: string
+          addLabel: 添加一个日子
+          value: []
+          children:
+            - $formkit: text
+              index: "$index"
+              placeholder: MM-DD
+          help: 每项一个 MM-DD（如 05-20）。当天页顶显示庆祝横幅，按服务器时区日期判定。
+
+        - $formkit: list
+          name: milestones
+          key: days_milestones_field
+          label: 信龄里程碑
+          itemType: number
+          addLabel: 添加一个天数
+          value: []
+          children:
+            - $formkit: number
+              index: "$index"
+              placeholder: "520"
+          help: 每项一个天数（如 100 / 520 / 1314）。命中当天显示 ♥ 蜡封章；留空 = 内置规则（百整 + 520/999/1314）。
+
+        - $formkit: textarea
+          name: daily_quotes
+          key: days_daily_quotes_field
+          label: 每日签（一行一句）
+          value: 今天的风很温柔，像你路过时一样。
+          rows: 5
+          help: 报头下的「今日签」。每行一句，按日期轮换；不足 6 句时自动补入主题内置情话池。
+
+        - $formkit: text
+          name: quote_api
+          key: days_quote_api_field
+          label: 今日签 API（可选）
+          value: ""
+          help: 填返回 JSON 的公开情话接口，读取 hitokoto / data / text / content 字段。留空只用上方手写句子；跨域或超时自动回退。
+
+        - $formkit: switch
+          name: show_quote
+          key: days_show_quote_field
+          label: 显示今日签
+          value: true
+          help: 关闭后报头下的一行情话整块隐藏，内容保留。
+
+        - $formkit: switch
+          name: live_time
+          key: days_live_time_field
+          label: 此刻 · 已同行
+          value: true
+          help: 在报头天数下实时显示共同走过的小时与分钟。
+
+        - $formkit: switch
+          name: show_anniv_countdown
+          key: days_show_anniv_countdown_field
+          label: 下一个纪念日倒计时
+          value: true
+          help: 报头账本里的「下一个纪念日还有 N 天」。不想强调周年时可以关闭。
+
+    - group: home
+      label: 首页与列表
+      formSchema:
+        - $formkit: select
+          id: list_layout
+          name: list_layout
+          key: home_list_layout_field
+          label: 首页列表版式
+          value: dual
+          options:
+            - label: 双侧信流（推荐）
+              value: dual
+            - label: 信笺对页
+              value: spread
+            - label: 明信片双列墙
+              value: postcard
+            - label: 邮票整版
+              value: stamps
+          help: 首页文章列表的四种版式，随时切换；其余内容页不受影响。
+
+        - $formkit: select
+          name: spread_mode
+          key: home_spread_mode_field
+          label: 信笺对页分侧
+          value: alternating
+          if: $get(list_layout).value === 'spread'
+          preserve: true
+          options:
+            - label: 左右页轮流（推荐）
+              value: alternating
+            - label: 按作者分侧（A 左 B 右）
+              value: by-author
+          help: 轮流=按发布顺序左右交替；按作者=A 的信固定左页、B 的信固定右页。仅「信笺对页」版式生效。
+
+        - $formkit: switch
+          name: show_excerpt
+          key: home_show_excerpt_field
+          label: 列表显示摘要
+          value: true
+          help: 首页与分类 / 标签 / 作者 / 归档列表都显示摘要；关闭后只留标题、署名与日期。
+
+        - $formkit: select
+          name: list_density
+          key: home_list_density_field
+          label: 列表疏密
+          value: cozy
+          options:
+            - label: 舒展（推荐）
+              value: cozy
+            - label: 紧凑（同屏更多）
+              value: compact
+          help: 只影响首页与分类 / 标签 / 作者列表的留白、摘要行数与封面高度。
+
+        - $formkit: switch
+          name: view_toggle
+          key: home_view_toggle_field
+          label: 顶栏双视角切换
+          value: true
+          help: 顶栏右侧的 A/B 视角按钮，切换整站纸面与强调色。
+
+        - $formkit: switch
+          name: seat_enabled
+          key: home_seat_enabled_field
+          label: 空位信笺（待写的信）
+          value: true
+          help: 本页只出现一位作者时，给另一位留一张「待写的信」。关闭后整卡隐藏。
+
+        - $formkit: switch
+          name: show_feature
+          key: home_show_feature_field
+          label: 首页头版
+          value: true
+          if: $get(list_layout).value === 'dual'
+          preserve: true
+          help: 仅「双侧信流」：最新一封跨双栏展示（左文右图）。关闭后所有信笺等宽排列。
+
+        - $formkit: switch
+          name: show_channels
+          key: home_show_channels_field
+          label: 频道筛选
+          value: true
+          help: 报头下方的分类栏。关闭后首页直接从报头进入信流。
+
+        - $formkit: switch
+          name: show_stock
+          key: home_show_stock_field
+          label: 库存数字
+          value: true
+          help: 报头里的已写信件 / 照片等统计。只影响显示，不影响数据。
+
+        - $formkit: switch
+          name: show_otd
+          key: home_show_otd_field
+          label: 那年今天
+          value: true
+          help: 信流之后的「往年今日」横条；没有同日旧信时本来就不会显示。
+
+        - $formkit: switch
+          name: show_knot
+          key: home_show_knot_field
+          label: 随机旧信尾签
+          value: true
+          help: 四种版式的信流末尾都会显示「再拆一封旧信」的随机入口。
+
+    - group: reading
+      label: 文章阅读
+      formSchema:
+        - $formkit: switch
+          name: show_toc
+          key: reading_show_toc_field
+          label: 文章目录
+          value: true
+          help: 文章页根据正文标题自动生成目录，滚动时高亮当前小节；标题少于两个时自动隐藏。
+
+        - $formkit: switch
+          name: show_stat
+          key: reading_show_stat_field
+          label: 字数与阅读时间
+          value: true
+          help: 文章页信头下方显示「约 N 字 · 读完约 N 分钟」。
+
+        - $formkit: switch
+          name: show_cover
+          key: reading_show_cover_field
+          label: 文章封面
+          value: true
+          help: 文章设了封面时，在标题上方以整幅照片呈现；没有封面的文章自动跳过。
+
+    - group: navigation
+      label: 导航与页脚
+      formSchema:
+        - $formkit: menuSelect
+          name: menu_name
+          key: navigation_menu_name_field
+          label: 主导航菜单
+          value: primary
+          help: 直接选择 Halo 后台「菜单」中的一份菜单；找不到时自动回退内置入口，二级菜单在顶栏显示为下拉。
+
+        - $formkit: select
+          id: footer_style
+          name: footer_style
+          key: navigation_footer_style_field
+          label: 页脚形式
+          value: compact
+          options:
+            - label: 精简（推荐：口号 + 链接 + 版权）
+              value: compact
+            - label: 完整（双人署名与纹章）
+              value: full
+            - label: 极简（只留分享与版权）
+              value: minimal
+          help: 页脚长度一键收放。完整形式以单行双人署名 + 中央纹章呈现；极简只留分享、RSS 与版权行。页脚不再重复站内导航。
+
+        - $formkit: switch
+          id: show_footer_note
+          name: show_footer_note
+          key: navigation_show_footer_note_field
+          label: 页脚口号
+          value: true
+          help: 显示页脚那句口号。开启后可在下方写自己的文案。
+
+        - $formkit: text
+          name: custom_footer_note
+          key: navigation_custom_footer_note_field
+          label: 自定义文案
+          if: $get(show_footer_note).value === true
+          preserve: true
+          help: 显示在页脚口号位的任意文案（一句话签名 / 备案号等），留空则用默认句。
+
+    - group: motion
+      label: 动效与氛围
+      formSchema:
+        - $formkit: select
+          name: level
+          key: motion_level_field
+          label: 动效强度
+          value: full
+          options:
+            - label: 完整（推荐）
+              value: full
+            - label: 克制（弱化装饰动效）
+              value: subtle
+            - label: 关闭（只留必要反馈）
+              value: "off"
+          help: 控制全站过渡与装饰动效。访客系统开启「减少动态效果」时，主题始终自动降级。
+
+        - $formkit: select
+          name: scene
+          key: motion_scene_field
+          label: 氛围场景
+          value: petals
+          options:
+            - label: 无（纯净纸面）
+              value: none
+            - label: 跟随四季（春樱 / 夏萤 / 秋星 / 冬雪）
+              value: auto
+            - label: 花瓣（推荐，春日落英）
+              value: petals
+            - label: 星屑（夜色微光）
+              value: stars
+            - label: 细雪（冬日安静）
+              value: snow
+            - label: 萤火（夏夜流萤）
+              value: fireflies
+          help: 页面上层缓慢飘落的氛围粒子，跟随明暗与主色，不影响点击与阅读。
+
+        - $formkit: switch
+          name: cursor
+          key: motion_cursor_field
+          label: 心形光标拖尾
+          value: false
+          help: 鼠标移动时留下极小的心形余光（仅桌面精细指针）。触屏与「减少动态效果」下自动不启用。
+
+        - $formkit: select
+          name: density
+          key: motion_density_field
+          label: 氛围密度
+          value: normal
+          options:
+            - label: 稀疏（若有似无）
+              value: sparse
+            - label: 适中（推荐）
+              value: normal
+            - label: 繁密（节日气氛）
+              value: dense
+          help: 只影响氛围粒子的数量；粒子总量始终有上限。
+
+        - $formkit: switch
+          name: auto_hide_topbar
+          key: motion_auto_hide_topbar_field
+          label: 小屏下滑收起顶栏
+          value: true
+          help: 手机上向下阅读时顶栏让位，上滑或聚焦即回。关闭后顶栏常驻。
+
+    - group: seo
+      label: 搜索与分享
+      formSchema:
+        - $formkit: switch
+          name: enable_metadata
+          key: seo_enable_metadata_field
+          label: 输出社交分享元数据与结构化数据
+          value: false
+          help: 补足 canonical、og:*/Twitter Card 与文章 BlogPosting 结构化数据。Halo 或 SEO 插件已提供时请保持关闭，避免重复输出。

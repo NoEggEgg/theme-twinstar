@@ -1,0 +1,179 @@
+
+<th:block
+  th:fragment="mast(aTok, bTok, faceA, faceB, aCount, bCount, photoCount, momentCount)"
+>
+  <section class="wqs-mast">
+    
+    <div class="wqs-mast__dateline">
+      <p class="wqs-mast__kicker">
+        <i class="wqs-mast__dia" aria-hidden="true"></i>
+        <span th:text="|${site.title} · ${#messages.msg('index.kicker')}|">雾起时 · 两个人的头版</span>
+      </p>
+      <p class="wqs-mast__issue">
+        <time th:text="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">2026-11-24</time>
+        <span aria-hidden="true">·</span>
+        <span>
+          <span th:text="${#messages.msg('ms.dayPrefix')}">第</span>
+          <b class="tabular" data-wqs-daycount>--</b>
+          <span th:text="${#messages.msg('ms.daySuffix')}">天</span>
+        </span>
+      </p>
+    </div>
+
+    
+    <h1 class="wqs-mast__title">
+      <span class="wqs-mast__a" th:text="${cfg.couple.partner_a_name}">A</span>
+      <span class="wqs-mast__leader" aria-hidden="true"></span>
+      <span class="wqs-mast__knot" aria-hidden="true">
+        <svg
+          class="wqs-mast__heart"
+          th:if="${#strings.isEmpty(cfg.couple.mast_heart) and !#strings.isEmpty(cfg.couple.partner_a_name) and !#strings.isEmpty(cfg.couple.partner_b_name)}"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path
+            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+          />
+        </svg>
+        <span
+          class="wqs-mast__hearttxt"
+          th:if="${!#strings.isEmpty(cfg.couple.mast_heart) and !#strings.isEmpty(cfg.couple.partner_a_name) and !#strings.isEmpty(cfg.couple.partner_b_name)}"
+          th:text="${cfg.couple.mast_heart}"
+        >♥</span>
+      </span>
+      <span class="wqs-mast__leader" aria-hidden="true"></span>
+      <span class="wqs-mast__bwrap">
+        <span class="wqs-mast__b" th:text="${cfg.couple.partner_b_name}">B</span>
+        <span
+          class="wqs-mast__poss"
+          th:if="${!#strings.isEmpty(cfg.couple.mast_suffix) and !#strings.isEmpty(cfg.couple.partner_b_name)}"
+          th:text="${cfg.couple.mast_suffix}"
+        >的博客</span>
+      </span>
+    </h1>
+
+    
+    <div class="wqs-mast__desks">
+      <th:block
+        th:replace="~{modules/index/mast-desk :: desk('a', ${cfg.couple.partner_a_name}, ${cfg.couple.partner_a_emoji}, ${faceA}, ${aCount}, ${aTok})}"
+      />
+
+      <div class="wqs-mast__ledger">
+        <p class="wqs-mast__lead" th:text="${#messages.msg('hero.days')}">在一起的第</p>
+        <p class="wqs-mast__num">
+          <b class="tabular" data-wqs-daycount>--</b>
+          <span class="wqs-mast__unit" th:text="${#messages.msg('ms.daySuffix')}">天</span>
+        </p>
+        <p class="wqs-mast__since" th:text="${#messages.msg('hero.since', cfg.days.anniversary_date)}">始于 2024-05-05</p>
+        <p class="wqs-mast__live" th:if="${cfg.days.live_time}" data-wqs-live>
+          <span th:text="${#messages.msg('mast.live')}">此刻 · 已同行</span>
+          <b class="tabular" data-wqs-live-h>--</b>
+          <span th:text="${#messages.msg('mast.liveH')}">小时</span>
+          <b class="tabular" data-wqs-live-m>--</b>
+          <span th:text="${#messages.msg('mast.liveM')}">分</span>
+        </p>
+        <p class="wqs-mast__next" th:if="${cfg.days.show_anniv_countdown}">
+          <span th:text="${#messages.msg('hero.annivPrefix')}">下一个纪念日还有</span>
+          <b class="tabular" data-wqs-annivdays>--</b>
+          <span th:text="${#messages.msg('hero.daysUnit')}">天</span>
+        </p>
+      </div>
+
+      <th:block
+        th:replace="~{modules/index/mast-desk :: desk('b', ${cfg.couple.partner_b_name}, ${cfg.couple.partner_b_emoji}, ${faceB}, ${bCount}, ${bTok})}"
+      />
+    </div>
+
+    <div class="wqs-mast__rule" aria-hidden="true"></div>
+
+    <div class="wqs-mast__stock" th:if="${cfg.home.show_stock}" th:aria-label="${#messages.msg('stats.aria')}">
+      <p class="wqs-mast__stock-label" th:text="${#messages.msg('index.stock')}">这个家的库存</p>
+      <ul class="wqs-mast__list">
+        <li>
+          <b class="tabular" th:text="${posts.total}">10</b>
+          <span th:text="${#messages.msg('stats.posts')}">封信</span>
+        </li>
+        <li th:if="${pluginFinder.available('PluginPhotos') and photoCount > 0}">
+          <b class="tabular" th:text="${photoCount}">12</b>
+          <span th:text="${#messages.msg('stats.photos')}">张相片</span>
+        </li>
+        <li th:if="${pluginFinder.available('PluginMoments') and momentCount > 0}">
+          <b class="tabular" th:text="${momentCount}">30</b>
+          <span th:text="${#messages.msg('stats.moments')}">个瞬间</span>
+        </li>
+      </ul>
+    </div>
+
+    
+    <div
+      class="wqs-mast__quote"
+      th:if="${cfg.days.show_quote}"
+      th:aria-label="${#messages.msg('a11y.quote')}"
+      th:attr="data-wqs-quote-api=${cfg.days.quote_api}, data-wqs-quote-from=${#messages.msg('quote.from')}"
+      th:with="qLines=${#strings.listSplit(cfg.days.daily_quotes, '\n')}"
+    >
+      <span class="wqs-mast__quote-label" aria-hidden="true" th:text="${#messages.msg('quote.label')}">今日签</span>
+      <p
+        class="wqs-mast__quote-text"
+        data-wqs-quote
+        aria-live="polite"
+        th:text="${#strings.isEmpty(cfg.days.daily_quotes) ? #messages.msg('quote.sample') : qLines[0]}"
+      >今天的风很温柔。</p>
+      <cite class="wqs-mast__quote-src" data-wqs-quote-src hidden></cite>
+      <button
+        type="button"
+        class="wqs-mast__quote-next"
+        data-wqs-quote-next
+        hidden
+        th:title="${#messages.msg('quote.next')}"
+      >
+        <span th:text="${#messages.msg('quote.next')}">换一句</span>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+          <path d="M13 8a5 5 0 1 1-1.6-3.7" />
+          <path d="M13 2.6V5.4h-2.8" />
+        </svg>
+      </button>
+      <span hidden data-wqs-quote-pool>
+        <span
+          th:each="q : ${qLines}"
+          th:if="${!#strings.isEmpty(#strings.trim(q))}"
+          th:text="${#strings.trim(q)}"
+          data-wqs-quote-item
+        ></span>
+      </span>
+      
+      <span hidden data-wqs-quote-builtin>
+        <span data-wqs-quote-item>今天的风很温柔，像你路过时一样。</span>
+        <span data-wqs-quote-item>想和你一起，把日子过成一封很长很长的信。</span>
+        <span data-wqs-quote-item>你是我所有平淡日子里，突然亮起来的那盏灯。</span>
+        <span data-wqs-quote-item>喜欢你这件事，藏不住，也不想藏。</span>
+        <span data-wqs-quote-item>世界很大，我只想和你挤在同一把伞下。</span>
+        <span data-wqs-quote-item>你一笑，我一整天的疲惫就有了归处。</span>
+        <span data-wqs-quote-item>和你在一起之后，连发呆都变得有意义。</span>
+        <span data-wqs-quote-item>我攒了好多温柔，想一股脑儿都给你。</span>
+        <span data-wqs-quote-item>想和你把四季过成同一种颜色，叫喜欢。</span>
+        <span data-wqs-quote-item>你不用完美，你只要是你，就已经很好。</span>
+        <span data-wqs-quote-item>我的偏爱很贵，但对你永远免费。</span>
+        <span data-wqs-quote-item>看到好看的晚霞，第一反应是想给你看。</span>
+        <span data-wqs-quote-item>日子很普通，但因为有你，每天都有了落款。</span>
+        <span data-wqs-quote-item>我没什么大本事，只想把你宠成小朋友。</span>
+        <span data-wqs-quote-item>你在的时候，时间总是过得太快；你不在，又太慢。</span>
+        <span data-wqs-quote-item>想和你一起，把「以后」两个字慢慢写完。</span>
+        <span data-wqs-quote-item>你是我认真喜欢、认真计划、认真想留下的人。</span>
+        <span data-wqs-quote-item>心动一次是运气，一直心动是答案。</span>
+        <span data-wqs-quote-item>不必惊天动地，只要每天醒来，你还在。</span>
+        <span data-wqs-quote-item>我把喜欢写成日常，你把它过成了家。</span>
+        <span data-wqs-quote-item>你是我兜兜转转，还是想回去的地方。</span>
+        <span data-wqs-quote-item>愿我们的每个明天，都比今天更靠近一点。</span>
+        <span data-wqs-quote-item>和你分享过的每一件小事，都不是小事。</span>
+        <span data-wqs-quote-item>你出现之后，我的世界才有了主语。</span>
+        <span data-wqs-quote-item>想牵着你的手，从春天走到下一个春天。</span>
+        <span data-wqs-quote-item>你是我疲惫生活里，最软的那一部分。</span>
+        <span data-wqs-quote-item>不擅长说情话，但擅长一直喜欢你。</span>
+        <span data-wqs-quote-item>今天的月亮很好看，但我更想看你。</span>
+        <span data-wqs-quote-item>我贪心一点：想要你的现在，也想要你的以后。</span>
+        <span data-wqs-quote-item>有你在，柴米油盐也能写成诗。</span>
+      </span>
+    </div>
+  </section>
+</th:block>
