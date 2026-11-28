@@ -18,25 +18,65 @@
               ownerName = ${post.owner != null ? post.owner.displayName : ''},
               whoName = ${isA ? cfg.couple.partner_a_name : (isB ? cfg.couple.partner_b_name : ownerName)},
               emoji = ${isA ? cfg.couple.partner_a_emoji : cfg.couple.partner_b_emoji},
+              ownerAv = ${post.owner != null and post.owner.avatar != null ? post.owner.avatar : ''},
+              cfgAv = ${isA ? cfg.couple.partner_a_avatar : cfg.couple.partner_b_avatar},
+              avatarSrc = ${!#strings.isEmpty(cfgAv) ? cfgAv : ownerAv},
               hasCover = ${!#strings.isEmpty(post.spec.cover)},
               coverSizes = ${'(max-width: 860px) 46vw, 300px'}
             "
           >
             <th:block
-              th:replace="~{modules/index/card-stamp :: card(${post}, ${cardStat}, ${isA}, ${hasCover}, ${whoName}, ${emoji}, ${coverSizes}, ${eagerName})}"
+              th:replace="~{modules/index/card-stamp :: card(${post}, ${cardStat}, ${isA}, ${hasCover}, ${whoName}, ${emoji}, ${avatarSrc}, ${coverSizes}, ${eagerName})}"
             />
           </th:block>
         </th:block>
 
         
-        <th:block th:with="blankCount=${(3 - #lists.size(posts.items) % 3) % 3}">
+        
+        <th:block th:with="
+          blankCount = ${(4 - #lists.size(posts.items) % 4) % 4},
+          blankNo = ${#lists.size(posts.items)}
+        ">
           <a
             class="wqs-stampcell wqs-stampcell--blank"
             th:if="${blankCount >= 1}"
             th:href="${!#strings.isEmpty(aTok) ? '/authors/' + aTok : null}"
             th:aria-label="${#messages.msg('footer.desk')}"
           >
-            <span class="wqs-stampcell__ph wqs-stampcell__ph--blank" aria-hidden="true"></span>
+            <span class="wqs-stampcell__ph wqs-stampcell__ph--blank" aria-hidden="true">
+              <span class="wqs-stampcell__pair">
+                <img
+                  th:if="${!#strings.isEmpty(cfg.couple.partner_a_avatar)}"
+                  class="wqs-stampcell__pairface"
+                  th:src="${cfg.couple.partner_a_avatar}"
+                  alt=""
+                  loading="lazy"
+                  data-wqs-avatar
+                  th:attr="data-wqs-avatar-emoji=${cfg.couple.partner_a_emoji}"
+                />
+                <span
+                  class="wqs-stampcell__pairface"
+                  th:if="${#strings.isEmpty(cfg.couple.partner_a_avatar)}"
+                  th:text="${cfg.couple.partner_a_emoji}"
+                >🐰</span>
+                <span class="wqs-stampcell__pairheart" aria-hidden="true">♥</span>
+                <img
+                  th:if="${!#strings.isEmpty(cfg.couple.partner_b_avatar)}"
+                  class="wqs-stampcell__pairface wqs-stampcell__pairface--b"
+                  th:src="${cfg.couple.partner_b_avatar}"
+                  alt=""
+                  loading="lazy"
+                  data-wqs-avatar
+                  th:attr="data-wqs-avatar-emoji=${cfg.couple.partner_b_emoji}"
+                />
+                <span
+                  class="wqs-stampcell__pairface wqs-stampcell__pairface--b"
+                  th:if="${#strings.isEmpty(cfg.couple.partner_b_avatar)}"
+                  th:text="${cfg.couple.partner_b_emoji}"
+                >🐱</span>
+              </span>
+              <span class="wqs-stampcell__no" th:text="|No. ${#numbers.formatInteger(blankNo + 1, 3)}|">No. 011</span>
+            </span>
             <span class="wqs-stampcell__title" th:text="${#messages.msg('stamps.blank')}">待贴</span>
             <span class="wqs-stampcell__date" aria-hidden="true">· · ·</span>
           </a>
@@ -46,10 +86,85 @@
             th:href="${!#strings.isEmpty(bTok) ? '/authors/' + bTok : null}"
             th:aria-label="${#messages.msg('footer.desk')}"
           >
-            <span class="wqs-stampcell__ph wqs-stampcell__ph--blank" aria-hidden="true"></span>
+            <span class="wqs-stampcell__ph wqs-stampcell__ph--blank" aria-hidden="true">
+              <span class="wqs-stampcell__pair">
+                <img
+                  th:if="${!#strings.isEmpty(cfg.couple.partner_a_avatar)}"
+                  class="wqs-stampcell__pairface"
+                  th:src="${cfg.couple.partner_a_avatar}"
+                  alt=""
+                  loading="lazy"
+                  data-wqs-avatar
+                  th:attr="data-wqs-avatar-emoji=${cfg.couple.partner_a_emoji}"
+                />
+                <span
+                  class="wqs-stampcell__pairface"
+                  th:if="${#strings.isEmpty(cfg.couple.partner_a_avatar)}"
+                  th:text="${cfg.couple.partner_a_emoji}"
+                >🐰</span>
+                <span class="wqs-stampcell__pairheart" aria-hidden="true">♥</span>
+                <img
+                  th:if="${!#strings.isEmpty(cfg.couple.partner_b_avatar)}"
+                  class="wqs-stampcell__pairface wqs-stampcell__pairface--b"
+                  th:src="${cfg.couple.partner_b_avatar}"
+                  alt=""
+                  loading="lazy"
+                  data-wqs-avatar
+                  th:attr="data-wqs-avatar-emoji=${cfg.couple.partner_b_emoji}"
+                />
+                <span
+                  class="wqs-stampcell__pairface wqs-stampcell__pairface--b"
+                  th:if="${#strings.isEmpty(cfg.couple.partner_b_avatar)}"
+                  th:text="${cfg.couple.partner_b_emoji}"
+                >🐱</span>
+              </span>
+              <span class="wqs-stampcell__no" th:text="|No. ${#numbers.formatInteger(blankNo + 2, 3)}|">No. 011</span>
+            </span>
             <span class="wqs-stampcell__title" th:text="${#messages.msg('stamps.blank')}">待贴</span>
             <span class="wqs-stampcell__date" aria-hidden="true">· · ·</span>
           </a>
+          <span
+            class="wqs-stampcell wqs-stampcell--blank"
+            th:if="${blankCount >= 3}"
+            aria-hidden="true"
+          >
+            <span class="wqs-stampcell__ph wqs-stampcell__ph--blank" aria-hidden="true">
+              <span class="wqs-stampcell__pair">
+                <img
+                  th:if="${!#strings.isEmpty(cfg.couple.partner_a_avatar)}"
+                  class="wqs-stampcell__pairface"
+                  th:src="${cfg.couple.partner_a_avatar}"
+                  alt=""
+                  loading="lazy"
+                  data-wqs-avatar
+                  th:attr="data-wqs-avatar-emoji=${cfg.couple.partner_a_emoji}"
+                />
+                <span
+                  class="wqs-stampcell__pairface"
+                  th:if="${#strings.isEmpty(cfg.couple.partner_a_avatar)}"
+                  th:text="${cfg.couple.partner_a_emoji}"
+                >🐰</span>
+                <span class="wqs-stampcell__pairheart" aria-hidden="true">♥</span>
+                <img
+                  th:if="${!#strings.isEmpty(cfg.couple.partner_b_avatar)}"
+                  class="wqs-stampcell__pairface wqs-stampcell__pairface--b"
+                  th:src="${cfg.couple.partner_b_avatar}"
+                  alt=""
+                  loading="lazy"
+                  data-wqs-avatar
+                  th:attr="data-wqs-avatar-emoji=${cfg.couple.partner_b_emoji}"
+                />
+                <span
+                  class="wqs-stampcell__pairface wqs-stampcell__pairface--b"
+                  th:if="${#strings.isEmpty(cfg.couple.partner_b_avatar)}"
+                  th:text="${cfg.couple.partner_b_emoji}"
+                >🐱</span>
+              </span>
+              <span class="wqs-stampcell__no" th:text="|No. ${#numbers.formatInteger(blankNo + 3, 3)}|">No. 011</span>
+            </span>
+            <span class="wqs-stampcell__title" th:text="${#messages.msg('stamps.blank')}">待贴</span>
+            <span class="wqs-stampcell__date" aria-hidden="true">· · ·</span>
+          </span>
         </th:block>
       </div>
     </div>

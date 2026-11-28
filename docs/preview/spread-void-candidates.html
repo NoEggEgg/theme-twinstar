@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>对页桌尾信纸区 · 现状对照与微调候选</title>
+<style>
+/* ============ 双星记对页版式 · 桌尾信纸区对比稿 ============
+   数据来源：8090 实机实测（2026-11-28，alternating 模式）
+   sheet 高 1237px；左列 5 卡至 886px；右列 5 卡（含两张封面卡）至 1218px；
+   fill--l 显示区间 900→1218（deskcard + 拉伸信纸 + 留给下一封）。
+   本页按实测几何 1:1 还原，三种呈现并排对照。 */
+:root {
+	--paper: #faf5ec;
+	--surface: #fffdf7;
+	--ink: #3d332a;
+	--ink-2: #7a6b58;
+	--border: #e4d7c2;
+	--tone-a: #8fb7ff;
+	--tone-b: #ff8fae;
+	--wax: #b0503f;
+	--craft: #c9b99a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+	background: var(--paper);
+	color: var(--ink);
+	font-family: "LXGW WenKai Screen", "LXGW WenKai", "Kaiti SC", STKaiti, KaiTi, "Noto Serif SC", serif;
+	padding: 48px 32px 80px;
+}
+.pagehead { max-width: 980px; margin: 0 auto 8px; text-align: center; }
+.pagehead h1 { font-size: 30px; letter-spacing: 0.06em; }
+.pagehead .sub { color: var(--ink-2); font-size: 14px; margin-top: 10px; line-height: 1.9; }
+.truth {
+	max-width: 980px; margin: 18px auto 40px; padding: 16px 22px;
+	background: #fff; border: 1px dashed var(--border); border-radius: 8px;
+	font-size: 13.5px; color: var(--ink-2); line-height: 2;
+}
+.truth b { color: var(--ink); }
+.truth code { font-family: "Space Mono", monospace; font-size: 12px; background: var(--paper); padding: 1px 6px; border-radius: 4px; }
+
+.variant { max-width: 980px; margin: 0 auto 56px; }
+.variant-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 6px; }
+.variant-head .tag {
+	font-size: 12px; letter-spacing: 0.18em; color: #fff; background: var(--wax);
+	padding: 3px 12px; border-radius: 999px;
+}
+.variant-head.recommend .tag { background: #4a7d6b; }
+.variant-head h2 { font-size: 20px; }
+.variant-note { font-size: 13.5px; color: var(--ink-2); line-height: 2; margin-bottom: 16px; }
+.variant-note b { color: var(--ink); }
+.verdict { margin-top: 12px; font-size: 13.5px; line-height: 2; color: var(--ink-2); }
+.verdict b.good { color: #4a7d6b; }
+.verdict b.bad { color: var(--wax); }
+
+/* ---- 对页纸面（按主题 spread.css 关键规则还原） ---- */
+.sheet {
+	position: relative; max-width: 980px; margin: 0 auto;
+	background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+	overflow: hidden; padding: 6px 0 18px;
+}
+.sheet::before {
+	content: ""; position: absolute; top: 0; bottom: 18px; left: 50%; width: 0;
+	border-left: 1px dashed color-mix(in srgb, var(--craft) 55%, transparent);
+}
+.col-l { float: left; clear: left; width: 50%; }
+.col-r { float: right; clear: right; width: 50%; }
+.sheet::after { content: ""; display: block; clear: both; }
+
+.pcard {
+	position: relative; margin: 0 26px 14px; background: #fff;
+	border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px 12px;
+}
+.col-l .pcard { background: color-mix(in srgb, var(--tone-a) 3%, #fff); }
+.col-r .pcard { background: color-mix(in srgb, var(--tone-b) 3%, #fff); }
+.hole {
+	position: absolute; top: 12px; right: 14px; width: 30px; height: 30px;
+	border: 1.5px dashed var(--wax); border-radius: 6px; color: var(--wax);
+	font-family: "Space Mono", monospace; font-size: 12px;
+	display: flex; align-items: center; justify-content: center;
+}
+.who { font-size: 12px; letter-spacing: 0.08em; margin-bottom: 8px; }
+.who.a { color: color-mix(in srgb, var(--tone-a) 60%, var(--ink)); }
+.who.b { color: color-mix(in srgb, var(--tone-b) 55%, var(--ink)); }
+.who i { font-style: normal; font-size: 14px; margin-right: 6px; }
+.pcard h3 { font-size: 16.5px; line-height: 1.5; margin-bottom: 6px; }
+.pcard .ex { font-size: 12.5px; color: var(--ink-2); line-height: 1.8; }
+.pcard .day { font-size: 11px; color: var(--ink-2); margin-top: 10px; font-family: "Space Mono", monospace; }
+.cover {
+	height: 130px; border-radius: 6px; margin: 4px 0 10px;
+	background:
+		radial-gradient(120px 60px at 70% 30%, rgba(255,255,255,.55), transparent 70%),
+		linear-gradient(160deg, #9db4c8 0%, #5c7a8e 45%, #2f4757 100%);
+}
+.cover.tall { height: 150px; }
+
+/* 蜡封心（骑缝，行间锚定位置示意） */
+.wax {
+	position: absolute; left: 50%; top: 700px; transform: translate(-50%, -50%);
+	width: 26px; height: 26px; border-radius: 50%;
+	background: radial-gradient(circle at 35% 30%, #d4695a, var(--wax) 70%);
+	color: #fdf6e3; font-size: 11px; display: flex; align-items: center; justify-content: center;
+	box-shadow: 0 1px 3px rgba(0,0,0,.25); z-index: 2;
+}
+
+/* ---- 案 A：现状 —— 桌尾信纸区（deskcard 顶 + 全高拉伸信纸 + 底注） ---- */
+.tail-A {
+	position: absolute; left: 0; bottom: 18px; width: 50%;
+	padding: 0 26px; display: flex; flex-direction: column; gap: 12px; z-index: 1;
+}
+.deskcard {
+	display: flex; align-items: center; gap: 12px; background: #fff;
+	border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px;
+}
+.deskcard .face {
+	width: 34px; height: 34px; border-radius: 50%; flex: none;
+	background: color-mix(in srgb, var(--tone-a) 22%, #fff); border: 1px solid var(--border);
+	display: flex; align-items: center; justify-content: center; font-size: 16px;
+}
+.deskcard .meta { flex: 1; min-width: 0; }
+.deskcard .meta b { font-size: 14px; }
+.deskcard .meta span { display: block; font-size: 11.5px; color: var(--ink-2); margin-top: 2px; }
+.deskcard .go { font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+.blank-letter {
+	flex: 1; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px;
+	font-size: 11px; letter-spacing: 0.18em; color: var(--ink-2);
+	background: repeating-linear-gradient(0deg, transparent 0 30px, color-mix(in srgb, var(--craft) 5%, transparent) 30px 31px);
+}
+
+/* ---- 案 B：紧凑封顶 —— 信纸区高度封顶一卡，余量还给纸面 ---- */
+.tail-B { position: absolute; left: 0; bottom: 18px; width: 50%; padding: 0 26px; }
+.tail-B .blank-letter { height: 96px; margin-top: 12px; align-items: center; }
+
+/* ---- 案 C：空位票化 —— 空白区变成一张虚线「待写的信」空位卡 ---- */
+.tail-C { position: absolute; left: 0; bottom: 18px; width: 50%; padding: 0 26px; }
+.blankcard {
+	border: 1.5px dashed color-mix(in srgb, var(--tone-a) 55%, transparent);
+	border-radius: 8px; padding: 18px; text-align: center;
+	background: color-mix(in srgb, var(--tone-a) 4%, transparent);
+}
+.blankcard .stamp {
+	width: 44px; height: 44px; border-radius: 50%; margin: 0 auto 10px;
+	background: color-mix(in srgb, var(--tone-a) 22%, #fff); border: 1px solid var(--border);
+	display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.blankcard b { font-size: 14px; display: block; }
+.blankcard span { font-size: 11.5px; color: var(--ink-2); display: block; margin-top: 6px; line-height: 1.8; }
+.tail-C .deskcard { margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<div class="pagehead">
+	<h1>对页 · 桌尾信纸区对照稿</h1>
+	<p class="sub">实测几何（alternating · 2026-11-28）：左列 5 卡至 886px，右列 5 卡至 1218px，纸面高 1237px。<br />
+	左列尾部 900→1218px 为 JS 锚定的补位区（<code>gap&gt;120px</code> 才显示）——deskcard 在顶、信纸拉伸、底注「留给下一封」。</p>
+</div>
+
+<div class="truth">
+	<b>实测更正</b>：此前报告的「左页 60% 空窗」是缩放截图判读错误——该区域是设计好的桌尾信纸区（<code>.wqs-fill</code> 绝对定位 <code>top: 短列卡底+14px → bottom: 18px</code>），不是裸空白。
+	对照稿比较的是：<b>这段 332px 的信纸区呈现得是否恰到好处</b>。三案共用同一份实测数据与卡面结构，仅尾部处理不同。
+</div>
+
+<!-- ============ 案 A 现状 ============ -->
+<div class="variant recommend">
+	<div class="variant-head recommend">
+		<span class="tag">案 A</span>
+		<h2>现状 · 桌尾信纸区（推荐保留）</h2>
+	</div>
+	<p class="variant-note">
+		<b>机制</b>：deskcard 悬顶 + <code>flex:1</code> 拉伸信纸（淡横线铺底）+ 底缘「留给下一封」。语义链完整：
+		<b>「这一列写完了（deskcard）→ 剩下的纸留给下一封（拉伸信纸）」</b>——把高度差本身说成了故事。
+	</p>
+	<div class="sheet" style="height:1237px">
+		<div class="col-l"><div class="pcard"><span class="hole">931</span><div class="who a"><i>🐰</i>小坏蛋</div><h3>写在天数九百日这天的信</h3><p class="ex">九百天，像九百页信纸铺在桌上……</p><p class="day">第 931 天</p></div></div>
+		<div class="col-r"><div class="pcard"><span class="hole">930</span><div class="who b"><i>🐱</i>小乖乖</div><h3>要是世上只有我们两个多好</h3><p class="ex">朱生豪写：「要是世上只有我们两个人多么好，我一定把你欺负得哭不出来。」</p><p class="day">第 930 天</p></div></div>
+		<div class="col-l"><div class="pcard"><span class="hole">929</span><div class="who a"><i>🐰</i>小坏蛋</div><h3>阳台上的薄荷</h3><p class="ex">薄荷又抽了一层新叶……</p><p class="day">第 929 天</p></div></div>
+		<div class="col-r"><div class="pcard"><span class="hole">928</span><div class="who b"><i>🐱</i>小乖乖</div><h3>周末的早餐提案 · 给你留了四人份</h3><div class="cover tall"></div><p class="ex">研究了很久的厚蛋烧，今天终于成功了……</p><p class="day">第 928 天</p></div></div>
+		<div class="col-l"><div class="pcard"><span class="hole">927</span><div class="who a"><i>🐰</i>小坏蛋</div><h3>抄书 · 第 3 页｜朱生豪《两行诗》</h3><p class="ex">最短的一句，也是我最喜欢的一句……</p><p class="day">第 927 天</p></div></div>
+		<div class="col-r"><div class="pcard"><span class="hole">926</span><div class="who b"><i>🐱</i>小乖乖</div><h3>同一条街，我们各自拍的那个角落</h3><div class="cover"></div><p class="ex">上周散步，走到老城区那个转角……</p><p class="day">第 926 天</p></div></div>
+		<div class="col-l"><div class="pcard"><span class="hole">925</span><div class="who a"><i>🐰</i>小坏蛋</div><h3>雨天读写信日历</h3><p class="ex">日历翻到雨季这一页……</p><p class="day">第 925 天</p></div></div>
+		<div class="col-r"><div class="pcard"><span class="hole">924</span><div class="who b"><i>🐱</i>小乖乖</div><h3>第一封信 · 书架上的朱生豪</h3><div class="cover tall"></div><p class="ex">周末整理书架，翻出了那本《醒来觉得甚是爱你》……</p><p class="day">第 924 天</p></div></div>
+		<div class="col-l"><div class="pcard"><span class="hole">923</span><div class="who a"><i>🐰</i>小坏蛋</div><h3>楼下的桂花开了</h3><p class="ex">桂花香是秋天寄来的信……</p><p class="day">第 923 天</p></div></div>
+		<div class="col-r"><div class="pcard"><span class="hole">922</span><div class="who b"><i>🐱</i>小乖乖</div><h3>雨停之后的天台</h3><p class="ex">天台的积水映着云……</p><p class="day">第 922 天</p></div></div>
+		<span class="wax">♥</span>
+		<div class="tail-A">
+			<div class="deskcard">
+				<div class="face">🐰</div>
+				<div class="meta"><b>小坏蛋</b><span>写了 134 封信</span></div>
+				<div class="go">去 TA 的信桌 →</div>
+			</div>
+			<div class="blank-letter">留 给 下 一 封</div>
+		</div>
+	</div>
+	<p class="verdict">
+		<b class="good">优点</b>：机制自洽、语义完整、零新增代码；信纸拉伸区与「留给下一封」底注把高度差讲成了内容。
+		<b class="bad">观察</b>：高度差大时信纸区较长（本例 318px ≈ 两倍卡高），deskcard 与右列最后一张卡之间隔着一段信纸，扫读时「收尾感」稍迟。
+		<b>结论：机制按设计工作，无需修复。</b>
+	</p>
+</div>
+
+<!-- ============ 案 B 紧凑封顶 ============ -->
+<div class="variant">
+	<div class="variant-head">
+		<span class="tag">案 B</span>
+		<h2>紧凑封顶 · 信纸区限高一卡</h2>
+	</div>
+	<p class="variant-note">
+		<b>机制</b>：信纸区 <code>max-height</code> 封顶（约一张卡高 + 底注），deskcard 紧跟本列最后一张卡，多余高度还给纸面留白。
+		改动 = spread.css 补位块加两行；JS 不动。
+	</p>
+	<div class="sheet" style="height:1237px">
+		<div class="col-l"><div class="pcard"><span class="hole">931</span><div class="who a"><i>🐰</i>小坏蛋</div><h3>写在天数九百日这天的信</h3><p class="ex">九百天，像九百页信纸铺在桌上……</p><p class="day">第 931 天</p></div></div>
+		<div class="col-r"><div class="pcard"><span class="hole">930</span><div class="who b"><i>🐱</i>小乖乖</div><h3>要是世上只有我们两个多好</h3><p class="ex">朱生豪写：「要是世上只有我们两个人多么好，我一定把你欺负得哭不出来。」</p><p class="day">第 930 天</p></div></div>
+		<div class="col-l"><div class="pcard"><span class="hole">929</span><div class="who a"><i>🐰</i>小坏蛋</div><h3>阳台上的薄荷</h3><p class="ex">薄荷又抽了一层新叶……</p><p class="day">第 929 天</p></div></div>
+		<div class="col-r"><div class="pcard"><span class="hole">928</span><div class="who b"><i>🐱</i>小乖乖</div><h3>周末的早餐提案 · 给你留了四人份</h3><div class="cover tall"></div><p class="ex">研究了很久的厚蛋烧，今天终于成功了……</p><p class="day">第 928 天</p></div></div>
+		<div class="col-l"><div class="pcard"><span class="hole">927</span><div class="who a"><i>🐰</i>小坏蛋</div><h3>抄书 · 第 3 页｜朱生豪《两行诗》</h3><p class="ex">最短的一句，也是我最喜欢的一句……</p><p class="day">第 927 天</p></div></div>
+		<div class="col-r"><div class="pcard"><span class="hole">926</span><div class="who b"><i>🐱</i>小乖乖</div><h3>同一条街，我们各自拍的那个角落</h3><div class="cover"></div><p class="ex">上周散步，走到老城区那个转角……</p><p class="day">第 926 天</p></div></div>
+		<div class="col-l"><div class="pcard"><span class="hole">925</span><div class="who a"><i>🐰</i>小坏蛋</div><h3>雨天读写信日历</h3><p class="ex">日历翻到雨季这一页……</p><p class="day">第 925 天</p></div></div>
+		<div class="col-r"><div class="pcard"><span class="hole">924</span><div class="who b"><i>🐱</i>小乖乖</div><h3>第一封信 · 书架上的朱生豪</h3><div class="cover tall"></div><p class="ex">周末整理书架，翻出了那本《醒来觉得甚是爱你》……</p><p class="day">第 924 天</p></div></div>
+		<div class="col-l"><div class="pcard"><span class="hole">923</span><div class="who a"><i>🐰</i>小坏蛋</div><h3>楼下的桂花开了</h3><p class="ex">桂花香是秋天寄来的信……</p><p class="day">第 923 天</p></div></div>
+		<div class="col-r"><div class="pcard"><span class="hole">922</span><div class="who b"><i>🐱</i>小乖乖</div><h3>雨停之后的天台</h3><p class="ex">天台的积水映着云……</p><p class="day">第 922 天</p></div></div>
+		<span class="wax">♥</span>
+		<div class="tail-B">
+			<div class="deskcard">
+				<div class="face">🐰</div>
+				<div class="meta"><b>小坏蛋</b><span>写了 134 封信</span></div>
+				<div class="go">去 TA 的信桌 →</div>
+			</div>
+			<div class="blank-letter">留 给 下 一 封</div>
+		</div>
+	</div>
+	<p class="verdict">
+		<b class="good">优点</b>：尾区紧凑，deskcard 紧跟内容，「收尾感」提前；改动最小（两行 CSS）。
+		<b class="bad">缺点</b>：deskcard 下方与纸底之间露出无注解的空白纸面——高度差被「藏」而非「说」；deskcard 与右列尾卡的对位关系随高度差浮动。
+	</p>
+</div>
+
+<!-- ============ 案 C 空位票化 ============ -->
+<div class="variant">
+	<div class="variant-head">
+		<span class="tag">案 C</span>
+		<h2>空位票化 · 空白区变成一张「待写的信」</h2>
+	</div>
+	<p class="variant-note">
+		<b>机制</b>：deskcard 保留在顶，信纸区改为一张虚线空位卡（复用空位信笺的视觉语言：人设章 + 「还没动笔」语义）。
+		改动 = spread.css 尾区结构 + 一段复用样式；语义与 stamps 版式的空位票、空位信笺三处趋同。
+	</p>
+	<div class="sheet" style="height:1237px">
+		<div class="col-l"><div class="pcard"><span class="hole">931</span><div class="who a"><i>🐰</i>小坏蛋</div><h3>写在天数九百日这天的信</h3><p class="ex">九百天，像九百页信纸铺在桌上……</p><p class="day">第 931 天</p></div></div>
+		<div class="col-r"><div class="pcard"><span class="hole">930</span><div class="who b"><i>🐱</i>小乖乖</div><h3>要是世上只有我们两个多好</h3><p class="ex">朱生豪写：「要是世上只有我们两个人多么好，我一定把你欺负得哭不出来。」</p><p class="day">第 930 天</p></div></div>
+		<div class="col-l"><div class="pcard"><span class="hole">929</span><div class="who a"><i>🐰</i>小坏蛋</div><h3>阳台上的薄荷</h3><p class="ex">薄荷又抽了一层新叶……</p><p class="day">第 929 天</p></div></div>
+		<div class="col-r"><div class="pcard"><span class="hole">928</span><div class="who b"><i>🐱</i>小乖乖</div><h3>周末的早餐提案 · 给你留了四人份</h3><div class="cover tall"></div><p class="ex">研究了很久的厚蛋烧，今天终于成功了……</p><p class="day">第 928 天</p></div></div>
+		<div class="col-l"><div class="pcard"><span class="hole">927</span><div class="who a"><i>🐰</i>小坏蛋</div><h3>抄书 · 第 3 页｜朱生豪《两行诗》</h3><p class="ex">最短的一句，也是我最喜欢的一句……</p><p class="day">第 927 天</p></div></div>
+		<div class="col-r"><div class="pcard"><span class="hole">926</span><div class="who b"><i>🐱</i>小乖乖</div><h3>同一条街，我们各自拍的那个角落</h3><div class="cover"></div><p class="ex">上周散步，走到老城区那个转角……</p><p class="day">第 926 天</p></div></div>
+		<div class="col-l"><div class="pcard"><span class="hole">925</span><div class="who a"><i>🐰</i>小坏蛋</div><h3>雨天读写信日历</h3><p class="ex">日历翻到雨季这一页……</p><p class="day">第 925 天</p></div></div>
+		<div class="col-r"><div class="pcard"><span class="hole">924</span><div class="who b"><i>🐱</i>小乖乖</div><h3>第一封信 · 书架上的朱生豪</h3><div class="cover tall"></div><p class="ex">周末整理书架，翻出了那本《醒来觉得甚是爱你》……</p><p class="day">第 924 天</p></div></div>
+		<div class="col-l"><div class="pcard"><span class="hole">923</span><div class="who a"><i>🐰</i>小坏蛋</div><h3>楼下的桂花开了</h3><p class="ex">桂花香是秋天寄来的信……</p><p class="day">第 923 天</p></div></div>
+		<div class="col-r"><div class="pcard"><span class="hole">922</span><div class="who b"><i>🐱</i>小乖乖</div><h3>雨停之后的天台</h3><p class="ex">天台的积水映着云……</p><p class="day">第 922 天</p></div></div>
+		<span class="wax">♥</span>
+		<div class="tail-C">
+			<div class="deskcard">
+				<div class="face">🐰</div>
+				<div class="meta"><b>小坏蛋</b><span>写了 134 封信</span></div>
+				<div class="go">去 TA 的信桌 →</div>
+			</div>
+			<div class="blankcard">
+				<div class="stamp">🐰</div>
+				<b>待写的信</b>
+				<span>还没动笔 · 第一封信写好，就会出现在这里</span>
+			</div>
+		</div>
+	</div>
+	<p class="verdict">
+		<b class="good">优点</b>：空白有了实体与文案，语义最外显；与「空位信笺/空位票」语言统一。
+		<b class="bad">缺点</b>：<b>语义冲突</b>——「待写的信」针对的是<b>没写过信的人</b>，而此处 TA 已写 134 封；桌尾这两张卡（deskcard + 空位卡）连续出现略显重复；新增一种卡片形态，维护面 +1。
+	</p>
+</div>
+
+<div class="truth" style="margin-top:8px">
+	<b>建议</b>：案 A（现状）。实测证明机制已把高度差讲成内容；若实际浏览中仍觉得尾区偏长，案 B 是最小代价的微调（两行 CSS、可随时回退）。案 C 语义冲突最重，不建议。
+</div>
+
+</body>
+</html>

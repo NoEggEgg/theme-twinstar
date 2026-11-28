@@ -24,7 +24,7 @@ spec:
   #   （ThemeReconciler 全局处理，重名会中止整轮 reconcile，theme-Flux 51 主题实例实证）。
   settingName: "theme-twinstar-setting"
   configMapName: "theme-twinstar-configMap"
-  version: 0.1.1
+  version: 0.1.2
   # 时间胶囊页（M3）：Console「页面 → 模板」下拉可选「时间胶囊」。
   # ⚠️ file 必须带 .html 后缀（HANDBOOK 官方合同；该值原样写入 SinglePage.spec.template）。
   customTemplates:

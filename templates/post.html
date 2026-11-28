@@ -15,7 +15,7 @@
     
     <article
       class="t-post"
-      th:attr="data-wqs-copy=${#messages.msg('code.copy')}, data-wqs-copied=${#messages.msg('code.copied')}, data-wqs-ld-title=${cfg.seo.enable_metadata ? post.spec.title : ''}, data-wqs-ld-date=${cfg.seo.enable_metadata ? #temporals.format(post.spec.publishTime, 'yyyy-MM-dd') : ''}, data-wqs-ld-author=${cfg.seo.enable_metadata ? ldAuthor : ''}, data-wqs-ld-image=${cfg.seo.enable_metadata ? coverAbs : ''}, data-wqs-ld-page=${cfg.seo.enable_metadata ? post.status.permalink : ''}"
+      th:attr="data-wqs-copy=${#messages.msg('code.copy')}, data-wqs-copied=${#messages.msg('code.copied')}"
       th:with="isCapsule = ${#annotations.contains(post, 'capsule_date')}, capDate = ${#annotations.get(post, 'capsule_date')}, todayStr = ${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}, locked = ${isCapsule and capDate != null and capDate > todayStr}, aMap = ${',' + #strings.replace(cfg.couple.partner_a_author, ' ', '') + ','}, bMap = ${',' + #strings.replace(cfg.couple.partner_b_author, ' ', '') + ','}, isA = ${post.owner != null and (#strings.contains(aMap, ',' + post.owner.metadata.name + ',') or #strings.contains(aMap, ',' + post.owner.displayName + ',') or post.owner.displayName == cfg.couple.partner_a_name or (!#strings.isEmpty(cfg.couple.partner_a_name) and (#strings.contains(#strings.trim(post.owner.displayName), #strings.trim(cfg.couple.partner_a_name)) or #strings.contains(#strings.trim(cfg.couple.partner_a_name), #strings.trim(post.owner.displayName)))))}, isB = ${post.owner != null and !isA and (#strings.contains(bMap, ',' + post.owner.metadata.name + ',') or #strings.contains(bMap, ',' + post.owner.displayName + ',') or post.owner.displayName == cfg.couple.partner_b_name or (!#strings.isEmpty(cfg.couple.partner_b_name) and (#strings.contains(#strings.trim(post.owner.displayName), #strings.trim(cfg.couple.partner_b_name)) or #strings.contains(#strings.trim(cfg.couple.partner_b_name), #strings.trim(post.owner.displayName)))))}, ownerName = ${post.owner != null ? post.owner.displayName : ''}, isCo = ${#annotations.getOrDefault(post, 'co_authored', 'no') == 'yes'}, coverAbs = ${#strings.isEmpty(post.spec.cover) ? '' : (#strings.startsWith(post.spec.cover, 'http') ? post.spec.cover : site.url + post.spec.cover)}, ldAuthor = ${isCo ? cfg.couple.partner_a_name + ',' + cfg.couple.partner_b_name : ownerName}, cfgAv = ${isA ? cfg.couple.partner_a_avatar : cfg.couple.partner_b_avatar}, ownerAv = ${post.owner != null ? post.owner.avatar : ''}, avatarSrc = ${#strings.isEmpty(cfgAv) ? ownerAv : cfgAv}"
     >
       
@@ -215,6 +215,19 @@
           th:if="${#annotations.getOrDefault(post, 'capsule_body', '') == ''}"
           th:utext="${post.content.content}"
         >正文</div>
+
+        
+        <footer class="wqs-stamp" data-wqs-stamp>
+          <span>
+            <i th:text="${#messages.msg('post.stampTop')}">本章由</i>
+            <b>
+              <span th:text="${cfg.couple.partner_a_name}">小坏蛋</span>
+              <span aria-hidden="true">♥</span>
+              <span th:text="${cfg.couple.partner_b_name}">小乖乖</span>
+            </b>
+            <i th:text="${#messages.msg('post.stampBottom')}">共同见证</i>
+          </span>
+        </footer>
         </div>
 
         
@@ -288,18 +301,6 @@
               </span>
             </a>
           </nav>
-        
-        <footer class="wqs-stamp" data-wqs-stamp>
-          <span>
-            <i th:text="${#messages.msg('post.stampTop')}">本章由</i>
-            <b>
-              <span th:text="${cfg.couple.partner_a_name}">小坏蛋</span>
-              <span aria-hidden="true">♥</span>
-              <span th:text="${cfg.couple.partner_b_name}">小乖乖</span>
-            </b>
-            <i th:text="${#messages.msg('post.stampBottom')}">共同见证</i>
-          </span>
-        </footer>
 
         
         <div class="wqs-archtags" th:if="${!#lists.isEmpty(post.categories) or !#lists.isEmpty(post.tags)}">
@@ -317,10 +318,35 @@
 
         </th:block>
       </th:block>
+
+      
+      <script
+        type="application/ld+json"
+        th:inline="javascript"
+        th:if="${cfg.seo.enable_metadata}"
+      >
+        {
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          "headline": [[${post.spec.title}]],
+          "datePublished": [[${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd')}]],
+          "author": [[${isCo ? {
+            {'@type': 'Person', 'name': cfg.couple.partner_a_name},
+            {'@type': 'Person', 'name': cfg.couple.partner_b_name}
+          } : {
+            {'@type': 'Person', 'name': ownerName}
+          }}]],
+          "image": [[${#strings.isEmpty(coverAbs) ? null : {coverAbs}}]],
+          "mainEntityOfPage": [[${#strings.startsWith(post.status.permalink, 'http') ? post.status.permalink : site.url + post.status.permalink}]]
+        }
+      </script>
     </article>
 
     
     <div class="t-comments" th:if="${haloCommentEnabled}">
+      <p class="t-comments__title" aria-hidden="true">
+        <span th:text="${#messages.msg('comments.title')}">回信</span>
+      </p>
       <halo:comment
         th:attr="group=${'content.halo.run'}, kind=${'Post'}, name=${post.metadata.name}"
       />

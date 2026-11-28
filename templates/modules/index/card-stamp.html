@@ -1,6 +1,6 @@
 
 <a
-  th:fragment="card(post, cardStat, isA, hasCover, whoName, emoji, coverSizes, eagerName)"
+  th:fragment="card(post, cardStat, isA, hasCover, whoName, emoji, avatarSrc, coverSizes, eagerName)"
   class="wqs-stampcell"
   th:attr="data-author=${isA ? 'a' : 'b'}"
   th:href="@{${post.status.permalink}}"
@@ -15,7 +15,17 @@
       />
     </th:block>
     <span class="wqs-stampcell__mono" th:unless="${hasCover}" aria-hidden="true">
-      <span class="wqs-stampcell__emoji" th:text="${emoji}">🐰</span>
+      
+      <img
+        th:if="${!#strings.isEmpty(avatarSrc)}"
+        class="wqs-stampcell__face"
+        th:src="${avatarSrc}"
+        alt=""
+        loading="lazy"
+        data-wqs-avatar
+        th:attr="data-wqs-avatar-emoji=${emoji}"
+      />
+      <span class="wqs-stampcell__emoji" th:if="${#strings.isEmpty(avatarSrc)}" th:text="${emoji}">🐰</span>
       <span class="wqs-stampcell__mono-name" th:text="${whoName}">作者</span>
     </span>
 
