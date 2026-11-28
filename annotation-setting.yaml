@@ -13,8 +13,8 @@ spec:
     # 模板消费用官方 #annotations 工具，
     # 参考 https://docs.halo.run/developer-guide/theme/annotations.md 。
 
-    # ---- 里程碑（PLAN M2）：index 里程碑时间轴消费 ----
-    # 模板消费：#annotations.contains(post, 'milestone_date') 过滤（见 src/templates/index.html）。
+    # ---- 里程碑：「我们的故事」页时间轴消费 ----
+    # 模板消费：#annotations.contains(post, 'milestone_date') 过滤（见 src/templates/page-story.html）。
     - $formkit: text
       name: milestone_date
       key: milestone_date_field

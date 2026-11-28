@@ -2,7 +2,7 @@
 <html
   xmlns:th="https://www.thymeleaf.org"
   xmlns:halo="https://halo.run/schema/thymeleaf"
-  th:replace="~{modules/layout :: html(content = ~{::content}, pageTitle = ${moment.owner.displayName})}"
+  th:replace="~{modules/layout :: html(content = ~{::content}, pageTitle = ${moment.owner?.displayName})}"
 >
   
 
@@ -22,11 +22,8 @@
           <span th:text="${#messages.msg('moments.back')}">回到瞬间</span>
         </a>
       </p>
-      <th:block
-        th:with="isA = ${moment.owner != null and (#strings.contains(aMap, ',' + moment.owner.name + ',') or #strings.contains(aMap, ',' + moment.owner.displayName + ',') or moment.owner.displayName == cfg.couple.partner_a_name or (!#strings.isEmpty(cfg.couple.partner_a_name) and (#strings.contains(#strings.trim(moment.owner.displayName), #strings.trim(cfg.couple.partner_a_name)) or #strings.contains(#strings.trim(cfg.couple.partner_a_name), #strings.trim(moment.owner.displayName)))))}, isB = ${moment.owner != null and !isA and (#strings.contains(bMap, ',' + moment.owner.name + ',') or #strings.contains(bMap, ',' + moment.owner.displayName + ',') or moment.owner.displayName == cfg.couple.partner_b_name)}, toneCls = ${isA ? 'is-a' : (isB ? 'is-b' : 'is-x')}, toneEmoji = ${isA ? cfg.couple.partner_a_emoji : (isB ? cfg.couple.partner_b_emoji : '✦')}"
-      >
-        <th:block th:insert="~{modules/moment-card :: card(${moment}, ${toneCls}, ${toneEmoji})}" />
-      </th:block>
+      
+      <th:block th:insert="~{modules/moment-card :: card(${moment})}" />
       <p class="wqs-moments__backrow">
         <a class="wqs-moments__back" th:href="@{/moments}">
           <span aria-hidden="true">←</span>

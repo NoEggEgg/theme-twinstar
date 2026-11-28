@@ -38,7 +38,7 @@
           <button
             type="button"
             class="wqs-photos__card"
-            th:attr="data-wqs-photo=${ph.spec.url}, data-wqs-photo-name=${ph.spec.displayName}"
+            th:attr="data-wqs-photo=${ph.spec.url}, data-wqs-photo-name=${ph.spec.displayName}, aria-label=${ph.spec.displayName}"
           >
             <img th:src="${ph.spec.url}" th:alt="${ph.spec.displayName}" loading="lazy" referrerpolicy="no-referrer" />
           </button>

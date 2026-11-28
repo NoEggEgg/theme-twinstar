@@ -16,18 +16,6 @@
       aMap = ${',' + #strings.replace(cfg.couple.partner_a_author, ' ', '') + ','},
       layout = ${#strings.contains('dual|spread|postcard|stamps', cfg.home.list_layout) ? cfg.home.list_layout : 'dual'},
       bMap = ${',' + #strings.replace(cfg.couple.partner_b_author, ' ', '') + ','},
-      aToks = ${#strings.listSplit(cfg.couple.partner_a_author, ',')},
-      aTok = ${#lists.isEmpty(aToks) ? '' : #strings.trim(aToks[0])},
-      bToks = ${#strings.listSplit(cfg.couple.partner_b_author, ',')},
-      bTok = ${#lists.isEmpty(bToks) ? '' : #strings.trim(bToks[0])},
-      userA = ${#strings.isEmpty(aTok) ? null : contributorFinder.getContributor(aTok)},
-      userB = ${#strings.isEmpty(bTok) ? null : contributorFinder.getContributor(bTok)},
-      faceA = ${!#strings.isEmpty(cfg.couple.partner_a_avatar) ? cfg.couple.partner_a_avatar : (userA != null ? userA.avatar : '')},
-      faceB = ${!#strings.isEmpty(cfg.couple.partner_b_avatar) ? cfg.couple.partner_b_avatar : (userB != null ? userB.avatar : '')},
-      aStat = ${#strings.isEmpty(aTok) ? null : postFinder.listByOwner(1, 1, aTok)},
-      aCount = ${aStat == null ? -1 : aStat.total},
-      bStat = ${#strings.isEmpty(bTok) ? null : postFinder.listByOwner(1, 1, bTok)},
-      bCount = ${bStat == null ? -1 : bStat.total},
       photoCount = ${pluginFinder.available('PluginPhotos') ? photoFinder.list(1, 1).total : 0},
       momentCount = ${pluginFinder.available('PluginMoments') ? momentFinder.list(1, 1).total : 0},
       hasPosts = ${!#lists.isEmpty(posts.items)},
@@ -38,7 +26,7 @@
   >
     
     <th:block
-      th:replace="~{modules/index/mast :: mast(${aTok}, ${bTok}, ${faceA}, ${faceB}, ${aCount}, ${bCount}, ${photoCount}, ${momentCount})}"
+      th:replace="~{modules/index/mast :: mast(${aTok}, ${bTok}, ${avA}, ${avB}, ${aCount}, ${bCount}, ${photoCount}, ${momentCount})}"
     />
 
     

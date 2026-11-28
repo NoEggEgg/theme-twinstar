@@ -6,13 +6,8 @@
 >
   
 
-  <th:block
-    th:fragment="content"
-    th:with="
-      aMap = ${',' + #strings.replace(cfg.couple.partner_a_author, ' ', '') + ','},
-      bMap = ${',' + #strings.replace(cfg.couple.partner_b_author, ' ', '') + ','}
-    "
-  >
+  
+  <th:block th:fragment="content">
     <section class="wqs-moments" th:aria-label="${#messages.msg('a11y.moments')}">
   <th:block th:replace="~{modules/layout :: chead(label=${#messages.msg('moments.title')})}" />
       <header class="wqs-pagehead">
@@ -43,7 +38,6 @@
       <ol class="wqs-moments__list">
         <li
           th:each="m, mStat : ${moments.items}"
-          th:with="isA = ${m.owner != null and (#strings.contains(aMap, ',' + m.owner.name + ',') or #strings.contains(aMap, ',' + m.owner.displayName + ',') or m.owner.displayName == cfg.couple.partner_a_name or (!#strings.isEmpty(cfg.couple.partner_a_name) and (#strings.contains(#strings.trim(m.owner.displayName), #strings.trim(cfg.couple.partner_a_name)) or #strings.contains(#strings.trim(cfg.couple.partner_a_name), #strings.trim(m.owner.displayName)))))}, isB = ${m.owner != null and !isA and (#strings.contains(bMap, ',' + m.owner.name + ',') or #strings.contains(bMap, ',' + m.owner.displayName + ',') or m.owner.displayName == cfg.couple.partner_b_name)}, toneCls = ${isA ? 'is-a' : (isB ? 'is-b' : 'is-x')}, toneEmoji = ${isA ? cfg.couple.partner_a_emoji : (isB ? cfg.couple.partner_b_emoji : '✦')}"
         >
           
           <p
@@ -52,7 +46,8 @@
           >
             <span th:text="${#temporals.format(m.spec.releaseTime, 'yyyy 年 M 月')}">2026 年 11 月</span>
           </p>
-          <th:block th:insert="~{modules/moment-card :: card(${m}, ${toneCls}, ${toneEmoji})}" />
+          
+          <th:block th:insert="~{modules/moment-card :: card(${m})}" />
         </li>
       </ol>
 

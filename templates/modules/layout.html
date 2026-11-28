@@ -5,8 +5,8 @@
   xmlns:halo="https://halo.run/schema/thymeleaf"
   th:lang="${#locale.toLanguageTag}"
   th:fragment="html"
-  th:classappend="|t-scheme-${cfg.appearance.color_scheme} color-scheme-${cfg.appearance.color_scheme}|"
-  th:attr="data-template=${_templateId}, data-color-scheme=${cfg.appearance.color_scheme}, data-title-face=${cfg.appearance.title_face}, data-grain=${cfg.appearance.grain_level}, data-motion=${cfg.motion.level}, data-scene=${cfg.motion.scene}, data-scene-density=${cfg.motion.density}, data-auto-hide=${cfg.motion.auto_hide_topbar}, data-cursor=${cfg.motion.cursor}, data-font-scale=${cfg.appearance.font_scale}, data-wqs-anniversary=${cfg.days.anniversary_date}, data-wqs-tz=${cfg.days.timezone}, data-wqs-name-a=${cfg.couple.partner_a_name}, data-wqs-name-b=${cfg.couple.partner_b_name}, data-wqs-celebrations=${#strings.listJoin(cfg.days.celebrations, ',')}, data-wqs-milestones=${#strings.listJoin(cfg.days.milestones, ',')}, data-list-density=${cfg.home.list_density}, data-wqs-lb-prev=${#messages.msg('lightbox.prev')}, data-wqs-lb-next=${#messages.msg('lightbox.next')}, data-wqs-lb-close=${#messages.msg('lightbox.close')}"
+  th:classappend="|t-scheme-${cfg.appearance.color_scheme}|"
+  th:attr="data-template=${_templateId}, data-color-scheme=${cfg.appearance.color_scheme}, data-title-face=${cfg.appearance.title_face}, data-grain=${cfg.appearance.grain_level}, data-motion=${cfg.motion.level}, data-scene=${cfg.motion.scene}, data-scene-density=${cfg.motion.density}, data-auto-hide=${cfg.motion.auto_hide_topbar}, data-cursor=${cfg.motion.cursor}, data-font-scale=${cfg.appearance.font_scale}, data-wqs-anniversary=${cfg.days.anniversary_date}, data-wqs-tz=${cfg.days.timezone}, data-wqs-name-a=${cfg.couple.partner_a_name}, data-wqs-name-b=${cfg.couple.partner_b_name}, data-wqs-celebrations=${#strings.listJoin(cfg.days.celebrations, ',')}, data-wqs-milestones=${#strings.listJoin(cfg.days.milestones, ',')}, data-list-density=${cfg.home.list_density}, data-wqs-lb-prev=${#messages.msg('lightbox.prev')}, data-wqs-lb-next=${#messages.msg('lightbox.next')}, data-wqs-lb-close=${#messages.msg('lightbox.close')}, data-wqs-lb-title=${#messages.msg('lightbox.title')}"
   th:styleappend="|--t-primary: ${cfg.appearance.primary_color}; --wqs-tone-a: ${cfg.couple.partner_a_tone}; --wqs-tone-b: ${cfg.couple.partner_b_tone}|"
   th:with="
     pageTitleSafe = ${#ctx.containsVariable('pageTitle') ? (#ctx.getVariable('pageTitle') != null ? #ctx.getVariable('pageTitle') : '') : ''},
@@ -46,6 +46,9 @@
     />
     <meta th:if="${cfg.appearance.color_scheme == 'light'}" name="theme-color" content="#faf5ec" />
     <meta th:if="${cfg.appearance.color_scheme == 'dark'}" name="theme-color" content="#1e1a17" />
+
+    
+    <link rel="icon" type="image/svg+xml" th:if="${#strings.isEmpty(site.favicon)}" th:href="@{/assets/logo.svg}" />
 
     
     <title
@@ -337,7 +340,8 @@
     </div>
 
     
-    <main class="t-main" id="t-main">
+    
+    <main class="t-main" id="t-main" tabindex="-1">
       <div class="t-content" th:insert="${content}"></div>
     </main>
 

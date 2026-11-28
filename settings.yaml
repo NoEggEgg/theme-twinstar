@@ -31,7 +31,7 @@ spec:
               value: light
             - label: 夜访者暗纸
               value: dark
-          help: 只作用于页身纸面；页顶天空的光线仍按时间走。
+          help: 只作用于页身纸面（报头与页顶均为纯纸面设计）。
 
         - $formkit: color
           name: primary_color

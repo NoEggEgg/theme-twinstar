@@ -1,11 +1,15 @@
 
 <th:block
-  th:fragment="card(m, toneCls, toneEmoji)"
+  th:fragment="card(m)"
   th:with="
     c = ${m.spec.content},
     owner = ${m.owner != null ? m.owner : null},
-    isA = ${toneCls == 'is-a'},
-    isB = ${toneCls == 'is-b'},
+    aMap = ${',' + #strings.replace(cfg.couple.partner_a_author, ' ', '') + ','},
+    bMap = ${',' + #strings.replace(cfg.couple.partner_b_author, ' ', '') + ','},
+    isA = ${owner != null and (#strings.contains(aMap, ',' + owner.name + ',') or #strings.contains(aMap, ',' + owner.displayName + ',') or owner.displayName == cfg.couple.partner_a_name or (!#strings.isEmpty(cfg.couple.partner_a_name) and (#strings.contains(#strings.trim(owner.displayName), #strings.trim(cfg.couple.partner_a_name)) or #strings.contains(#strings.trim(cfg.couple.partner_a_name), #strings.trim(owner.displayName)))))},
+    isB = ${owner != null and !isA and (#strings.contains(bMap, ',' + owner.name + ',') or #strings.contains(bMap, ',' + owner.displayName + ',') or owner.displayName == cfg.couple.partner_b_name or (!#strings.isEmpty(cfg.couple.partner_b_name) and (#strings.contains(#strings.trim(owner.displayName), #strings.trim(cfg.couple.partner_b_name)) or #strings.contains(#strings.trim(cfg.couple.partner_b_name), #strings.trim(owner.displayName)))))},
+    toneCls = ${isA ? 'is-a' : (isB ? 'is-b' : 'is-x')},
+    toneEmoji = ${isA ? cfg.couple.partner_a_emoji : (isB ? cfg.couple.partner_b_emoji : '✦')},
     ownerName = ${owner != null and !#strings.isEmpty(owner.displayName) ? owner.displayName : #messages.msg('wall.anon')},
     cfgName = ${isA ? cfg.couple.partner_a_name : (isB ? cfg.couple.partner_b_name : '')},
     whoName = ${#strings.isEmpty(cfgName) ? ownerName : cfgName},

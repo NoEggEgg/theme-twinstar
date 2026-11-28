@@ -32,6 +32,7 @@
         <a
           class="wqs-minipost__cover"
           th:classappend="${!#strings.isEmpty(post.spec.cover) ? '' : 'wqs-minipost__cover--ph'}"
+          th:aria-label="${post.spec.title}"
           th:href="@{${post.status.permalink}}"
         >
           <th:block th:if="${!#strings.isEmpty(post.spec.cover)}">
